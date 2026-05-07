@@ -44,6 +44,9 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("14_dead4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_dead0")
 }],
 "loop": false,
 "name": &"dead",
@@ -59,6 +62,11 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 4.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"new_animation",
+"speed": 5.0
 }]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_pip2"]
@@ -94,6 +102,8 @@ scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_enemy")
 animation = &"dead"
 autoplay = "idle"
+frame = 5
+frame_progress = 1.0
 
 [node name="Damage" type="Sprite2D" parent="." unique_id=1183122299]
 visible = false
@@ -193,6 +203,27 @@ custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 text = "Purify"
 
+[node name="ChoiceButtons" type="HBoxContainer" parent="UI" unique_id=183135158]
+visible = false
+offset_left = 280.0
+offset_top = 460.0
+offset_right = 680.0
+offset_bottom = 510.0
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ListenBtn" type="Button" parent="UI/ChoiceButtons" unique_id=1597221966]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+text = "Listen"
+
+[node name="WalkBtn" type="Button" parent="UI/ChoiceButtons" unique_id=796049855]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+text = "Walk on"
+
 [connection signal="pressed" from="UI/SpellButtons/LightBtn" to="." method="_on_light_pressed"]
 [connection signal="pressed" from="UI/SpellButtons/ShineBtn" to="." method="_on_shine_pressed"]
 [connection signal="pressed" from="UI/SpellButtons/PurifyBtn" to="." method="_on_purify_pressed"]
+[connection signal="pressed" from="UI/ChoiceButtons/ListenBtn" to="." method="_on_listen_pressed"]
+[connection signal="pressed" from="UI/ChoiceButtons/WalkBtn" to="." method="_on_walk_pressed"]

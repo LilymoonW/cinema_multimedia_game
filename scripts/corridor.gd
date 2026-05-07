@@ -18,8 +18,8 @@ extends Node2D
 @onready var walk_prompt: Label = $UI/WalkPrompt
 
 const INTRO_LINES := [
-	"You are the chosen one!",
-	"Your homeland is in danger from the Shadows.",
+	"Hi I've been waiting for your appearance",
+	"Your  is in danger from the Shadows.",
 	"Hold the right arrow key to walk — your light will save us!",
 ]
 
@@ -32,6 +32,7 @@ func _ready() -> void:
 	player.play("walk")
 	pip.play("sparkle")
 	walk_prompt.visible = false
+	Audio.play_music()
 	_spawn_enemies()
 	if GameState.encounter_index == 0:
 		_show_dialog_line(0)
@@ -90,6 +91,7 @@ func _show_dialog_line(i: int) -> void:
 	dialog_text.text = INTRO_LINES[i]
 
 func _on_next_pressed() -> void:
+	Audio.play_sfx("tap")
 	dialog_index += 1
 	if dialog_index >= INTRO_LINES.size():
 		dialog.visible = false
@@ -106,4 +108,5 @@ func _trigger_encounter() -> void:
 	if transitioning:
 		return
 	transitioning = true
+	Audio.play_sfx("jump")
 	get_tree().change_scene_to_file("res://scenes/combat.tscn")

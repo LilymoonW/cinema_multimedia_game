@@ -8,8 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://b07xeel0l2bkw" path="res://assets/sprites/sparkle1.png" id="7_spark1"]
 [ext_resource type="Texture2D" uid="uid://dxfgyvmd4ogxf" path="res://assets/sprites/sparkle2.png" id="8_spark2"]
 [ext_resource type="Texture2D" uid="uid://c2sxtojgurd8e" path="res://assets/backgrounds/ground_tile.png" id="9_ground"]
-[ext_resource type="Texture2D" uid="uid://dwo84jeun03wk" path="res://assets/sprites/cry.png" id="10_cry1"]
-[ext_resource type="Texture2D" uid="uid://duf2gkvw6448s" path="res://assets/sprites/cry1.png" id="11_cry2"]
+[ext_resource type="Texture2D" uid="uid://bbml57tu5k301" path="res://assets/sprites/enemy1.png" id="10_f323m"]
+[ext_resource type="Texture2D" uid="uid://8mbaa1j78p3x" path="res://assets/sprites/enemy2.png" id="11_so7gr"]
 [ext_resource type="Texture2D" uid="uid://tu7w1g8orwi6" path="res://assets/backgrounds/ground_top.png" id="12_groundtop"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
@@ -44,13 +44,13 @@ animations = [{
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("10_cry1")
+"texture": ExtResource("10_f323m")
 }, {
 "duration": 1.0,
-"texture": ExtResource("11_cry2")
+"texture": ExtResource("11_so7gr")
 }],
 "loop": true,
-"name": &"cry",
+"name": &"idle",
 "speed": 4.0
 }]
 
@@ -61,8 +61,8 @@ script = ExtResource("1_corridor")
 [node name="Parallax" type="Node2D" parent="." unique_id=286178477]
 
 [node name="Sky" type="Sprite2D" parent="Parallax" unique_id=1011090078]
-position = Vector2(472, 282)
-scale = Vector2(0.4, 0.4)
+position = Vector2(532.00006, 281)
+scale = Vector2(0.44915256, 0.4)
 texture = ExtResource("2_sky")
 
 [node name="GroundTop" type="Sprite2D" parent="Parallax" unique_id=1128130692]
@@ -84,18 +84,18 @@ region_rect = Rect2(0, 0, 4000, 70)
 [node name="Trees" type="Node2D" parent="Parallax" unique_id=546937055]
 
 [node name="Tree1" type="Sprite2D" parent="Parallax/Trees" unique_id=146445865]
-position = Vector2(541.99994, 396)
-scale = Vector2(1.1, 1.1)
+position = Vector2(489, 344.00003)
+scale = Vector2(2.0620005, 1.8459998)
 texture = ExtResource("4_tree")
 
 [node name="Tree2" type="Sprite2D" parent="Parallax/Trees" unique_id=215691473]
-position = Vector2(1100, 305)
-scale = Vector2(0.95, 0.95)
+position = Vector2(1086, 344.00003)
+scale = Vector2(1.9630005, 1.9789999)
 texture = ExtResource("4_tree")
 
 [node name="Tree3" type="Sprite2D" parent="Parallax/Trees" unique_id=975260843]
-position = Vector2(1500, 280)
-scale = Vector2(1.2, 1.2)
+position = Vector2(1562, 314)
+scale = Vector2(2.3360004, 2.1039999)
 texture = ExtResource("4_tree")
 
 [node name="Player" type="AnimatedSprite2D" parent="." unique_id=935857216]
@@ -116,8 +116,8 @@ autoplay = "sparkle"
 position = Vector2(820, 430)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_cry")
-animation = &"cry"
-autoplay = "cry"
+animation = &"idle"
+autoplay = "idle"
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1921867508]
 

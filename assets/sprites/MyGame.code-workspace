@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../Downloads/brackeys_platformer_assets/sounds"
+		},
+		{
+			"path": "../../../Downloads/brackeys_platformer_assets/music"
+		},
+		{
+			"path": "../../../Downloads/brackeys_platformer_assets/fonts"
+		}
+	],
+	"settings": {}
+}
