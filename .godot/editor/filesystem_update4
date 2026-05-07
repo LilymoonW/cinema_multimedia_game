@@ -1,0 +1,4 @@
+res://scripts/combat.gd
+res://scripts/game_state.gd
+res://scenes/corridor.tscn
+res://scenes/combat.tscn

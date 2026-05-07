@@ -1,18 +1,54 @@
-[gd_scene load_steps=12 format=3 uid="uid://b3combat1"]
+[gd_scene format=3 uid="uid://b3combat1"]
 
-[ext_resource type="Script" path="res://scripts/combat.gd" id="1_combat"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/sky.png" id="2_sky"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/grass.png" id="3_grass"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy1.png" id="4_e1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemy2.png" id="5_e2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/sad.png" id="6_sad1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/sad2.png" id="7_sad2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/dead.png" id="8_dead"]
-[ext_resource type="Texture2D" path="res://assets/sprites/sparkle1.png" id="9_spark1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/sparkle2.png" id="10_spark2"]
+[ext_resource type="Script" uid="uid://bk3g82mernntv" path="res://scripts/combat.gd" id="1_combat"]
+[ext_resource type="Texture2D" uid="uid://i0fe6ueean7l" path="res://assets/backgrounds/sky.png" id="2_sky"]
+[ext_resource type="Texture2D" uid="uid://by2lrwxqq3h2y" path="res://assets/backgrounds/grass.png" id="3_grass"]
+[ext_resource type="Texture2D" uid="uid://bbml57tu5k301" path="res://assets/sprites/enemy1.png" id="4_e1"]
+[ext_resource type="Texture2D" uid="uid://8mbaa1j78p3x" path="res://assets/sprites/enemy2.png" id="5_e2"]
+[ext_resource type="Texture2D" uid="uid://dwo84jeun03wk" path="res://assets/sprites/cry.png" id="6_cry1"]
+[ext_resource type="Texture2D" uid="uid://duf2gkvw6448s" path="res://assets/sprites/cry1.png" id="7_cry2"]
+[ext_resource type="Texture2D" uid="uid://cayno5j56m2a" path="res://assets/sprites/dead.png" id="8_dead0"]
+[ext_resource type="Texture2D" uid="uid://b07xeel0l2bkw" path="res://assets/sprites/sparkle1.png" id="9_spark1"]
+[ext_resource type="Texture2D" uid="uid://dxfgyvmd4ogxf" path="res://assets/sprites/sparkle2.png" id="10_spark2"]
+[ext_resource type="Texture2D" uid="uid://crw3iwgn67ewd" path="res://assets/sprites/dead1.png" id="11_dead1"]
+[ext_resource type="Texture2D" uid="uid://dw7o7wd7awr70" path="res://assets/sprites/dead2.png" id="12_dead2"]
+[ext_resource type="Texture2D" uid="uid://dylj0ph8ta54e" path="res://assets/sprites/dead3.png" id="13_dead3"]
+[ext_resource type="Texture2D" uid="uid://cj6dk7rr483m" path="res://assets/sprites/dead4.png" id="14_dead4"]
+[ext_resource type="Texture2D" uid="uid://c3nayby7u407t" path="res://assets/sprites/damage.png" id="16_damage"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_enemy"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_cry1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_cry2")
+}],
+"loop": true,
+"name": &"cry",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_dead0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_dead1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_dead2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_dead3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_dead4")
+}],
+"loop": false,
+"name": &"dead",
+"speed": 6.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("4_e1")
@@ -23,25 +59,6 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 4.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("6_sad1")
-}, {
-"duration": 1.0,
-"texture": ExtResource("7_sad2")
-}],
-"loop": true,
-"name": &"sad",
-"speed": 3.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("8_dead")
-}],
-"loop": false,
-"name": &"dead",
-"speed": 1.0
 }]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_pip2"]
@@ -58,82 +75,124 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="Combat" type="Node2D"]
+[node name="Combat" type="Node2D" unique_id=1284406082]
 script = ExtResource("1_combat")
 
-[node name="Sky" type="Sprite2D" parent="."]
+[node name="Sky" type="Sprite2D" parent="." unique_id=1804928625]
 position = Vector2(480, 180)
 scale = Vector2(0.4, 0.4)
 texture = ExtResource("2_sky")
 
-[node name="Grass" type="Sprite2D" parent="."]
+[node name="Grass" type="Sprite2D" parent="." unique_id=1608042225]
 position = Vector2(480, 460)
 scale = Vector2(8, 1.5)
 texture = ExtResource("3_grass")
 
-[node name="Enemy" type="AnimatedSprite2D" parent="."]
+[node name="Enemy" type="AnimatedSprite2D" parent="." unique_id=841868721]
 position = Vector2(480, 320)
 scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_enemy")
-animation = &"idle"
+animation = &"dead"
 autoplay = "idle"
 
-[node name="Pip" type="AnimatedSprite2D" parent="."]
-position = Vector2(820, 140)
+[node name="Damage" type="Sprite2D" parent="." unique_id=1183122299]
+visible = false
+position = Vector2(480, 270)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("16_damage")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=511768640]
+
+[node name="HopeLabel" type="Label" parent="UI" unique_id=663110488]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 200.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 22
+text = "HOPE: 0"
+
+[node name="PlayerHPLabel" type="Label" parent="UI" unique_id=2122134164]
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 240.0
+offset_bottom = 80.0
+theme_override_colors/font_color = Color(1, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 20
+text = "HP: 20/20"
+
+[node name="EnemyHPLabel" type="Label" parent="UI" unique_id=506177099]
+offset_left = 740.0
+offset_top = 20.0
+offset_right = 940.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Enemy: 4/4"
+horizontal_alignment = 2
+
+[node name="PipPanel" type="ColorRect" parent="UI" unique_id=1255650393]
+offset_left = 10.0
+offset_top = 390.0
+offset_right = 280.0
+offset_bottom = 530.0
+color = Color(0.05, 0.05, 0.12, 0.75)
+
+[node name="PipBorder" type="ColorRect" parent="UI" unique_id=1192538866]
+offset_left = 10.0
+offset_top = 390.0
+offset_right = 280.0
+offset_bottom = 393.0
+color = Color(1, 0.95, 0.7, 0.9)
+
+[node name="Pip" type="AnimatedSprite2D" parent="UI" unique_id=1706984778]
+position = Vector2(70, 460)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_pip2")
 animation = &"sparkle"
 autoplay = "sparkle"
 
-[node name="UI" type="CanvasLayer" parent="."]
-
-[node name="HopeLabel" type="Label" parent="UI"]
-offset_left = 20.0
-offset_top = 20.0
-offset_right = 200.0
-offset_bottom = 50.0
-text = "HOPE: 0"
-theme_override_font_sizes/font_size = 22
-
-[node name="PipText" type="Label" parent="UI"]
-offset_left = 600.0
-offset_top = 80.0
-offset_right = 940.0
-offset_bottom = 130.0
+[node name="PipText" type="Label" parent="UI" unique_id=659098717]
+offset_left = 130.0
+offset_top = 410.0
+offset_right = 275.0
+offset_bottom = 525.0
+theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
+theme_override_font_sizes/font_size = 14
 text = "Defeat the corruption!"
-horizontal_alignment = 2
-theme_override_font_sizes/font_size = 18
+autowrap_mode = 2
 
-[node name="Narration" type="Label" parent="UI"]
+[node name="Narration" type="Label" parent="UI" unique_id=698077816]
 offset_left = 100.0
 offset_top = 380.0
 offset_right = 860.0
 offset_bottom = 420.0
-text = ""
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 20
 theme_override_colors/font_color = Color(0.9, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
 
-[node name="SpellButtons" type="HBoxContainer" parent="UI"]
+[node name="SpellButtons" type="HBoxContainer" parent="UI" unique_id=183135157]
 offset_left = 280.0
 offset_top = 460.0
 offset_right = 680.0
 offset_bottom = 510.0
-alignment = 1
 theme_override_constants/separation = 16
+alignment = 1
 
-[node name="LightBtn" type="Button" parent="UI/SpellButtons"]
+[node name="LightBtn" type="Button" parent="UI/SpellButtons" unique_id=1597221965]
 custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
 text = "Light"
 
-[node name="ShineBtn" type="Button" parent="UI/SpellButtons"]
+[node name="ShineBtn" type="Button" parent="UI/SpellButtons" unique_id=796049854]
 custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
 text = "Shine"
 
-[node name="PurifyBtn" type="Button" parent="UI/SpellButtons"]
+[node name="PurifyBtn" type="Button" parent="UI/SpellButtons" unique_id=1759470448]
 custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
 text = "Purify"
 
-[connection signal="pressed" from="UI/SpellButtons/LightBtn" to="." method="_on_spell_pressed"]
-[connection signal="pressed" from="UI/SpellButtons/ShineBtn" to="." method="_on_spell_pressed"]
-[connection signal="pressed" from="UI/SpellButtons/PurifyBtn" to="." method="_on_spell_pressed"]
+[connection signal="pressed" from="UI/SpellButtons/LightBtn" to="." method="_on_light_pressed"]
+[connection signal="pressed" from="UI/SpellButtons/ShineBtn" to="." method="_on_shine_pressed"]
+[connection signal="pressed" from="UI/SpellButtons/PurifyBtn" to="." method="_on_purify_pressed"]

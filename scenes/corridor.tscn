@@ -1,13 +1,16 @@
-[gd_scene load_steps=11 format=3 uid="uid://b2corridor1"]
+[gd_scene format=3 uid="uid://b2corridor1"]
 
-[ext_resource type="Script" path="res://scripts/corridor.gd" id="1_corridor"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/sky.png" id="2_sky"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/grass.png" id="3_grass"]
-[ext_resource type="Texture2D" path="res://assets/sprites/tree.png" id="4_tree"]
-[ext_resource type="Texture2D" path="res://assets/sprites/walk.png" id="5_walk1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/walk2.png" id="6_walk2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/sparkle1.png" id="7_spark1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/sparkle2.png" id="8_spark2"]
+[ext_resource type="Script" uid="uid://wgt8vbkvrq5f" path="res://scripts/corridor.gd" id="1_corridor"]
+[ext_resource type="Texture2D" uid="uid://i0fe6ueean7l" path="res://assets/backgrounds/sky.png" id="2_sky"]
+[ext_resource type="Texture2D" uid="uid://cb111tfnve6ax" path="res://assets/sprites/tree.png" id="4_tree"]
+[ext_resource type="Texture2D" uid="uid://dtcy5ke0jleum" path="res://assets/sprites/walk.png" id="5_walk1"]
+[ext_resource type="Texture2D" uid="uid://bisa5rt5tj2hv" path="res://assets/sprites/walk2.png" id="6_walk2"]
+[ext_resource type="Texture2D" uid="uid://b07xeel0l2bkw" path="res://assets/sprites/sparkle1.png" id="7_spark1"]
+[ext_resource type="Texture2D" uid="uid://dxfgyvmd4ogxf" path="res://assets/sprites/sparkle2.png" id="8_spark2"]
+[ext_resource type="Texture2D" uid="uid://c2sxtojgurd8e" path="res://assets/backgrounds/ground_tile.png" id="9_ground"]
+[ext_resource type="Texture2D" uid="uid://dwo84jeun03wk" path="res://assets/sprites/cry.png" id="10_cry1"]
+[ext_resource type="Texture2D" uid="uid://duf2gkvw6448s" path="res://assets/sprites/cry1.png" id="11_cry2"]
+[ext_resource type="Texture2D" uid="uid://tu7w1g8orwi6" path="res://assets/backgrounds/ground_top.png" id="12_groundtop"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
@@ -37,48 +40,150 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="Corridor" type="Node2D"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_cry"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_cry1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_cry2")
+}],
+"loop": true,
+"name": &"cry",
+"speed": 4.0
+}]
+
+[node name="Corridor" type="Node2D" unique_id=1493437284]
+position = Vector2(-1, -25)
 script = ExtResource("1_corridor")
 
-[node name="Parallax" type="Node2D" parent="."]
+[node name="Parallax" type="Node2D" parent="." unique_id=286178477]
 
-[node name="Sky" type="Sprite2D" parent="Parallax"]
-position = Vector2(480, 180)
+[node name="Sky" type="Sprite2D" parent="Parallax" unique_id=1011090078]
+position = Vector2(472, 282)
 scale = Vector2(0.4, 0.4)
 texture = ExtResource("2_sky")
 
-[node name="Grass" type="Sprite2D" parent="Parallax"]
-position = Vector2(480, 460)
-scale = Vector2(8, 1.5)
-texture = ExtResource("3_grass")
+[node name="GroundTop" type="Sprite2D" parent="Parallax" unique_id=1128130692]
+texture_repeat = 2
+position = Vector2(0, 420)
+texture = ExtResource("12_groundtop")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 4000, 50)
 
-[node name="Trees" type="Node2D" parent="Parallax"]
+[node name="Ground" type="Sprite2D" parent="Parallax" unique_id=1803718616]
+texture_repeat = 2
+position = Vector2(0, 470)
+texture = ExtResource("9_ground")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 4000, 70)
 
-[node name="Tree1" type="Sprite2D" parent="Parallax/Trees"]
-position = Vector2(700, 380)
-scale = Vector2(0.6, 0.6)
+[node name="Trees" type="Node2D" parent="Parallax" unique_id=546937055]
+
+[node name="Tree1" type="Sprite2D" parent="Parallax/Trees" unique_id=146445865]
+position = Vector2(541.99994, 396)
+scale = Vector2(1.1, 1.1)
 texture = ExtResource("4_tree")
 
-[node name="Tree2" type="Sprite2D" parent="Parallax/Trees"]
-position = Vector2(1100, 390)
-scale = Vector2(0.5, 0.5)
+[node name="Tree2" type="Sprite2D" parent="Parallax/Trees" unique_id=215691473]
+position = Vector2(1100, 305)
+scale = Vector2(0.95, 0.95)
 texture = ExtResource("4_tree")
 
-[node name="Tree3" type="Sprite2D" parent="Parallax/Trees"]
-position = Vector2(1500, 380)
-scale = Vector2(0.7, 0.7)
+[node name="Tree3" type="Sprite2D" parent="Parallax/Trees" unique_id=975260843]
+position = Vector2(1500, 280)
+scale = Vector2(1.2, 1.2)
 texture = ExtResource("4_tree")
 
-[node name="Player" type="AnimatedSprite2D" parent="."]
-position = Vector2(280, 380)
+[node name="Player" type="AnimatedSprite2D" parent="." unique_id=935857216]
+position = Vector2(280, 420)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_player")
 animation = &"walk"
 autoplay = "walk"
 
-[node name="Pip" type="AnimatedSprite2D" parent="."]
-position = Vector2(360, 320)
+[node name="Pip" type="AnimatedSprite2D" parent="." unique_id=1388151049]
+position = Vector2(360, 360)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_pip")
 animation = &"sparkle"
 autoplay = "sparkle"
+
+[node name="Cry" type="AnimatedSprite2D" parent="." unique_id=1086286375]
+position = Vector2(820, 430)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_cry")
+animation = &"cry"
+autoplay = "cry"
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1921867508]
+
+[node name="WalkPrompt" type="Label" parent="UI" unique_id=636019958]
+visible = false
+offset_left = 240.0
+offset_top = 60.0
+offset_right = 720.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(1, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 22
+text = "▶ Hold the RIGHT ARROW key to walk"
+horizontal_alignment = 1
+
+[node name="DialogBox" type="Control" parent="UI" unique_id=1320283832]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 59.0
+offset_top = 355.0
+offset_right = 899.0
+offset_bottom = 485.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Background" type="ColorRect" parent="UI/DialogBox" unique_id=890685102]
+layout_mode = 0
+offset_right = 840.0
+offset_bottom = 130.0
+color = Color(0.05, 0.05, 0.12, 0.85)
+metadata/_edit_use_anchors_ = true
+
+[node name="PipIcon" type="AnimatedSprite2D" parent="UI/DialogBox" unique_id=894961346]
+position = Vector2(50, 65)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_pip")
+animation = &"sparkle"
+autoplay = "sparkle"
+
+[node name="Speaker" type="Label" parent="UI/DialogBox" unique_id=824841121]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 12.0
+offset_right = 300.0
+offset_bottom = 38.0
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "Pip"
+metadata/_edit_use_anchors_ = true
+
+[node name="Text" type="Label" parent="UI/DialogBox" unique_id=1909355121]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 42.0
+offset_right = 820.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="NextButton" type="Button" parent="UI/DialogBox" unique_id=1166685874]
+layout_mode = 0
+offset_left = 720.0
+offset_top = 90.0
+offset_right = 820.0
+offset_bottom = 122.0
+text = "Next ▶"
+metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="UI/DialogBox/NextButton" to="." method="_on_next_pressed"]
