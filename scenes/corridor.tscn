@@ -4,7 +4,9 @@
 [ext_resource type="Texture2D" uid="uid://i0fe6ueean7l" path="res://assets/backgrounds/sky.png" id="2_sky"]
 [ext_resource type="Texture2D" uid="uid://cb111tfnve6ax" path="res://assets/sprites/tree.png" id="4_tree"]
 [ext_resource type="Texture2D" uid="uid://dtcy5ke0jleum" path="res://assets/sprites/walk.png" id="5_walk1"]
+[ext_resource type="Texture2D" uid="uid://c6xqdbiftqoq4" path="res://assets/sprites/profile2.png" id="6_ucmnp"]
 [ext_resource type="Texture2D" uid="uid://bisa5rt5tj2hv" path="res://assets/sprites/walk2.png" id="6_walk2"]
+[ext_resource type="Texture2D" uid="uid://3bs8xup2xyjo" path="res://assets/sprites/profile.png" id="7_pbkn3"]
 [ext_resource type="Texture2D" uid="uid://b07xeel0l2bkw" path="res://assets/sprites/sparkle1.png" id="7_spark1"]
 [ext_resource type="Texture2D" uid="uid://dxfgyvmd4ogxf" path="res://assets/sprites/sparkle2.png" id="8_spark2"]
 [ext_resource type="Texture2D" uid="uid://c2sxtojgurd8e" path="res://assets/backgrounds/ground_tile.png" id="9_ground"]
@@ -14,6 +16,17 @@
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_ucmnp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_pbkn3")
+}],
+"loop": true,
+"name": &"profile",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("5_walk1")
@@ -67,7 +80,7 @@ texture = ExtResource("2_sky")
 
 [node name="GroundTop" type="Sprite2D" parent="Parallax" unique_id=1128130692]
 texture_repeat = 2
-position = Vector2(0, 420)
+position = Vector2(1, 448)
 texture = ExtResource("12_groundtop")
 centered = false
 region_enabled = true
@@ -75,7 +88,7 @@ region_rect = Rect2(0, 0, 4000, 50)
 
 [node name="Ground" type="Sprite2D" parent="Parallax" unique_id=1803718616]
 texture_repeat = 2
-position = Vector2(0, 470)
+position = Vector2(2, 497)
 texture = ExtResource("9_ground")
 centered = false
 region_enabled = true

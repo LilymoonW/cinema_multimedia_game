@@ -1,12 +1,14 @@
 extends Node2D
 
 @onready var enemy_template: AnimatedSprite2D = $Enemy
+@onready var boss_template: AnimatedSprite2D = $BossTemplate
 @onready var enemy_layer: Node2D = $EnemyLayer
 @onready var pip: AnimatedSprite2D = $UI/Pip
 @onready var pip_text: Label = $UI/PipText
 @onready var narration: Label = $UI/Narration
 @onready var spell_buttons: HBoxContainer = $UI/SpellButtons
 @onready var choice_buttons: HBoxContainer = $UI/ChoiceButtons
+@onready var pip_choice_buttons: HBoxContainer = $UI/PipChoiceButtons
 @onready var hope_label: Label = $UI/HopeLabel
 @onready var player_hp_label: Label = $UI/PlayerHPLabel
 @onready var enemy_hp_label: Label = $UI/EnemyHPLabel
@@ -14,9 +16,12 @@ extends Node2D
 @onready var run_button: Button = $UI/RunButton
 @onready var reticle: Label = $UI/Reticle
 @onready var damage_flash: Sprite2D = $Damage
+@onready var spell_effect: AnimatedSprite2D = $SpellEffect
 @onready var ending_panel: ColorRect = $UI/EndingPanel
 @onready var ending_text: Label = $UI/EndingPanel/Text
 @onready var ending_button: Button = $UI/EndingPanel/Continue
+@onready var profile: AnimatedSprite2D = $UI/Profile
+@onready var actor_turn_label: Label = $UI/ActorTurnLabel
 
 enum State { PLAYER_INPUT, RESOLVING, ENEMY_TURN, PIP_TURN, CHOICE, WIN, LOSE, ENDING }
 const REVEAL_CHAR_DELAY := 0.035
@@ -44,14 +49,12 @@ const PIP_LINES := {
 }
 
 const PIP_HINTS := {
-	"Light":  "Pip points... use Light.",
 	"Shine":  "Pip points... use Shine.",
 	"Purify": "Pip points... use Purify.",
 }
 
 # Damage rolls per spell: [min, max]. ±1 variance around base.
 const SPELL_POWER := {
-	"Light":  [1, 2],
 	"Shine":  [2, 3],
 	"Purify": [3, 4],
 }
@@ -61,11 +64,9 @@ const ENEMY_ATTACK_RANGE := [1, 3]
 const BOSS_MAX_HP := 14
 const BOSS_ATTACK_RANGE := [2, 4]
 
-# Pip turn: every Nth player turn, Pip acts.
-const PIP_TURN_INTERVAL := 2
+# Pip acts at the start of every round, before the player's spell.
 const PIP_HEAL := 3
 const PIP_BUFF := 2
-const PIP_HEAL_THRESHOLD := 12
 
 const NARRATION := [
 	["...mother..."],
@@ -94,19 +95,22 @@ const PIP_GASLIGHT_LINES := [
 var enemies: Array = [] # [{ sprite, hp_label, hp, max_hp, alive }]
 var target_index: int = 0
 var damage_buff: int = 0
-var turns_taken: int = 0
 var is_boss_fight: bool = false
 var current_enemy_index: int = 0
 var boss_flash_active: bool = false
+var current_actor: String = "player"
 
 func _ready() -> void:
 	is_boss_fight = GameState.is_boss_next()
 	enemy_template.visible = false
+	boss_template.visible = false
 	pip.play("sparkle")
+	profile.play("idle")
 	narration.text = ""
 	pip_action_label.text = ""
 	ending_panel.visible = false
 	choice_buttons.visible = false
+	pip_choice_buttons.visible = false
 	run_button.visible = is_boss_fight
 	reticle.visible = false
 	if not run_button.pressed.is_connected(_on_run_pressed):
@@ -124,10 +128,10 @@ func _ready() -> void:
 	_update_hud()
 	_pick_expected_spell()
 	_set_mood(Mood.NORMAL)
-	state = State.PLAYER_INPUT
 	if is_boss_fight:
 		await _reveal_narration("A vast Shadow blocks the path.")
 		_start_boss_flash_loop()
+	_start_round()
 
 func _process(_delta: float) -> void:
 	if state != State.PLAYER_INPUT:
@@ -159,15 +163,16 @@ func _cycle_target(dir: int) -> void:
 func _spawn_enemies(n: int) -> void:
 	var positions: Array = _enemy_positions(n)
 	var max_hp: int = BOSS_MAX_HP if is_boss_fight else ENEMY_MAX_HP
+	var template: AnimatedSprite2D = boss_template if is_boss_fight else enemy_template
 	for i in n:
-		var spr: AnimatedSprite2D = enemy_template.duplicate()
+		var spr: AnimatedSprite2D = template.duplicate()
 		enemy_layer.add_child(spr)
 		spr.visible = true
 		spr.position = positions[i]
 		spr.play("idle")
 		if is_boss_fight:
 			spr.scale = Vector2(1.4, 1.4)
-			spr.modulate = Color(1.0, 0.7, 0.7)
+			spr.modulate = Color(1.0, 0.85, 0.85)
 		var hp_label := Label.new()
 		hp_label.add_theme_font_size_override("font_size", 14)
 		hp_label.add_theme_color_override("font_color", Color(1, 0.9, 0.9))
@@ -259,7 +264,7 @@ func _on_spell_pressed(spell_name: String = "Light") -> void:
 		pip_action_label.text = ""
 	var target = enemies[target_index]
 	target.hp -= damage
-	_flash_damage(target.sprite.position)
+	_play_spell_effect(spell_name, target.sprite.position)
 	_show_damage_number(target.sprite.position, damage)
 	_update_hud()
 	if target.hp <= 0:
@@ -273,7 +278,7 @@ func _on_spell_pressed(spell_name: String = "Light") -> void:
 			target.sprite.play("idle")
 	if _alive_count() == 0:
 		return
-	await _advance_turn()
+	await _enemy_turn()
 
 func _roll_spell_damage(spell_name: String) -> int:
 	var range_pair: Array = SPELL_POWER.get(spell_name, [1, 1])
@@ -281,40 +286,57 @@ func _roll_spell_damage(spell_name: String) -> int:
 	var hi: int = int(range_pair[1])
 	return randi_range(lo, hi)
 
-func _advance_turn() -> void:
-	turns_taken += 1
-	if turns_taken % PIP_TURN_INTERVAL == 0:
-		await _pip_turn()
-	if state == State.ENDING or state == State.LOSE:
+# A round = Pip's choice → your spell → enemy turn.
+func _start_round() -> void:
+	if state == State.ENDING or state == State.LOSE or state == State.CHOICE:
 		return
-	await _enemy_turn()
+	if _alive_count() == 0:
+		return
+	_pip_turn()
 
+# Player picks Pip's action. Resolves in _on_enchant_pressed / _on_cheer_pressed.
 func _pip_turn() -> void:
 	state = State.PIP_TURN
-	await get_tree().create_timer(0.4).timeout
-	var did_heal: bool = GameState.player_hp <= PIP_HEAL_THRESHOLD
+	_set_active_actor("pip")
+	if not boss_flash_active:
+		pip_text.text = "Tell me — bless your strike, or lift you up?"
+	spell_buttons.visible = false
+	pip_choice_buttons.visible = true
+
+func _on_enchant_pressed() -> void:
+	if state != State.PIP_TURN:
+		return
 	Audio.play_sfx("power_up")
-	if did_heal:
-		var heal: int = min(PIP_HEAL, GameState.PLAYER_MAX_HP - GameState.player_hp)
-		GameState.player_hp += heal
-		pip_action_label.text = "Pip: Cheer!  +%d HP" % heal
-		if not boss_flash_active:
-			pip_text.text = "Stay bright, hero!"
-		_show_damage_number(Vector2(150, 250), heal, Color(0.7, 1, 0.7))
-	else:
-		damage_buff = PIP_BUFF
-		pip_action_label.text = "Pip: Enchant!  next spell +%d" % PIP_BUFF
-		if not boss_flash_active:
-			pip_text.text = "I bless your strike!"
-	pip.modulate = Color(1, 1, 0.6)
-	pip.scale = Vector2(0.5, 0.5) * 1.25
+	damage_buff = PIP_BUFF
+	pip_action_label.text = "Pip: Enchant!  next spell +%d" % PIP_BUFF
+	if not boss_flash_active:
+		pip_text.text = "I bless your strike!"
+	_finish_pip_turn()
+
+func _on_cheer_pressed() -> void:
+	if state != State.PIP_TURN:
+		return
+	Audio.play_sfx("power_up")
+	var heal: int = min(PIP_HEAL, GameState.PLAYER_MAX_HP - GameState.player_hp)
+	GameState.player_hp += heal
+	pip_action_label.text = "Pip: Cheer!  +%d HP" % heal
+	if not boss_flash_active:
+		pip_text.text = "Stay bright, hero!"
+	_show_damage_number(profile.position, heal, Color(0.7, 1, 0.7))
 	_update_hud()
-	await get_tree().create_timer(0.9).timeout
-	pip.modulate = MOOD_TINTS[mood]
-	pip.scale = Vector2(0.5, 0.5)
+	_finish_pip_turn()
+
+func _finish_pip_turn() -> void:
+	pip_choice_buttons.visible = false
+	spell_buttons.visible = true
+	state = State.PLAYER_INPUT
+	_set_active_actor("player")
+	if not boss_flash_active:
+		pip_text.text = PIP_HINTS.get(expected_spell, "")
 
 func _enemy_turn() -> void:
 	state = State.ENEMY_TURN
+	_set_active_actor("enemy")
 	await get_tree().create_timer(0.4).timeout
 	if _alive_count() == 0:
 		return
@@ -328,8 +350,8 @@ func _enemy_turn() -> void:
 				total += randi_range(int(atk_range[0]), int(atk_range[1]))
 	GameState.player_hp -= total
 	Audio.play_sfx("hurt")
-	_flash_damage(Vector2(480, 270))
-	_show_damage_number(Vector2(480, 250), total, Color(1, 0.5, 0.5))
+	_flash_damage(profile.position)
+	_show_damage_number(profile.position, total, Color(1, 0.5, 0.5))
 	_set_mood(Mood.UPSET)
 	_update_hud()
 	if GameState.player_hp <= 0:
@@ -341,7 +363,29 @@ func _enemy_turn() -> void:
 	await get_tree().create_timer(0.5).timeout
 	_pick_expected_spell()
 	_set_mood(Mood.NORMAL)
-	state = State.PLAYER_INPUT
+	_start_round()
+
+func _set_active_actor(who: String) -> void:
+	current_actor = who
+	# Tint profile, Pip and the actor turn label so it's clear whose turn it is.
+	match who:
+		"player":
+			profile.modulate = Color(1, 1, 1)
+			actor_turn_label.text = "Your turn"
+			actor_turn_label.add_theme_color_override("font_color", Color(0.85, 0.95, 1))
+			if not boss_flash_active:
+				pip.modulate = MOOD_TINTS[mood] * Color(0.7, 0.7, 0.7)
+		"pip":
+			profile.modulate = Color(0.7, 0.7, 0.8)
+			actor_turn_label.text = "Pip's turn"
+			actor_turn_label.add_theme_color_override("font_color", Color(1, 1, 0.6))
+			pip.modulate = Color(1, 1, 0.6)
+		"enemy":
+			profile.modulate = Color(1, 0.55, 0.55)
+			actor_turn_label.text = "Enemy turn"
+			actor_turn_label.add_theme_color_override("font_color", Color(1, 0.6, 0.6))
+			if not boss_flash_active:
+				pip.modulate = MOOD_TINTS[mood] * Color(0.6, 0.6, 0.6)
 
 func _kill_enemy(idx: int) -> void:
 	var e = enemies[idx]
@@ -377,9 +421,12 @@ func _kill_enemy(idx: int) -> void:
 
 func _reveal_narration(line: String) -> void:
 	narration.text = ""
+	if line.length() > 0:
+		Audio.start_speak()
 	for i in line.length():
 		narration.text = line.substr(0, i + 1)
 		await get_tree().create_timer(REVEAL_CHAR_DELAY).timeout
+	Audio.stop_speak()
 	await get_tree().create_timer(0.5).timeout
 
 func _offer_choice() -> void:
@@ -417,7 +464,6 @@ func _pick_expected_spell() -> void:
 
 func _set_mood(new_mood: Mood) -> void:
 	mood = new_mood
-	pip.modulate = MOOD_TINTS[new_mood]
 	var base_scale := Vector2(0.5, 0.5)
 	match new_mood:
 		Mood.EXCITED, Mood.HAPPY:
@@ -428,6 +474,8 @@ func _set_mood(new_mood: Mood) -> void:
 			pip.scale = base_scale * 1.2
 		_:
 			pip.scale = base_scale
+	# Re-apply active-actor tinting so the mood change doesn't override it.
+	_set_active_actor(current_actor)
 	if boss_flash_active:
 		return
 	var lines: Array = PIP_LINES[new_mood]
@@ -443,6 +491,20 @@ func _flash_damage(at: Vector2) -> void:
 	var tween := create_tween()
 	tween.tween_property(damage_flash, "modulate:a", 0.0, 0.35)
 	tween.tween_callback(func(): damage_flash.visible = false)
+
+func _play_spell_effect(spell_name: String, at: Vector2) -> void:
+	var anim: String = "pow" if spell_name == "Purify" else "slash"
+	spell_effect.position = at
+	spell_effect.modulate = Color(1, 1, 1, 1)
+	spell_effect.visible = true
+	spell_effect.frame = 0
+	spell_effect.play(anim)
+	var tween := create_tween()
+	tween.tween_interval(0.32)
+	tween.tween_property(spell_effect, "modulate:a", 0.0, 0.18)
+	tween.tween_callback(func():
+		spell_effect.visible = false
+		spell_effect.stop())
 
 func _show_damage_number(at: Vector2, amount: int, color: Color = Color(1, 0.95, 0.6)) -> void:
 	var lbl := Label.new()
@@ -549,6 +611,5 @@ func _on_ending_continue() -> void:
 	GameState.reset_run()
 	get_tree().change_scene_to_file("res://scenes/title.tscn")
 
-func _on_light_pressed() -> void: _on_spell_pressed("Light")
 func _on_shine_pressed() -> void: _on_spell_pressed("Shine")
 func _on_purify_pressed() -> void: _on_spell_pressed("Purify")

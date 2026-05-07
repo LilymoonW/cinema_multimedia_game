@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://bk3g82mernntv" path="res://scripts/combat.gd" id="1_combat"]
 [ext_resource type="Texture2D" uid="uid://i0fe6ueean7l" path="res://assets/backgrounds/sky.png" id="2_sky"]
-[ext_resource type="Texture2D" uid="uid://by2lrwxqq3h2y" path="res://assets/backgrounds/grass.png" id="3_grass"]
 [ext_resource type="Texture2D" uid="uid://bbml57tu5k301" path="res://assets/sprites/enemy1.png" id="4_e1"]
 [ext_resource type="Texture2D" uid="uid://8mbaa1j78p3x" path="res://assets/sprites/enemy2.png" id="5_e2"]
 [ext_resource type="Texture2D" uid="uid://dwo84jeun03wk" path="res://assets/sprites/cry.png" id="6_cry1"]
@@ -13,8 +12,19 @@
 [ext_resource type="Texture2D" uid="uid://crw3iwgn67ewd" path="res://assets/sprites/dead1.png" id="11_dead1"]
 [ext_resource type="Texture2D" uid="uid://dw7o7wd7awr70" path="res://assets/sprites/dead2.png" id="12_dead2"]
 [ext_resource type="Texture2D" uid="uid://dylj0ph8ta54e" path="res://assets/sprites/dead3.png" id="13_dead3"]
+[ext_resource type="Texture2D" uid="uid://cydcn243ra40b" path="res://assets/sprites/bossDizzy.png" id="14_8f6io"]
 [ext_resource type="Texture2D" uid="uid://cj6dk7rr483m" path="res://assets/sprites/dead4.png" id="14_dead4"]
+[ext_resource type="Texture2D" uid="uid://bn00i6udeafwa" path="res://assets/sprites/boss2.png" id="16_bug7f"]
 [ext_resource type="Texture2D" uid="uid://c3nayby7u407t" path="res://assets/sprites/damage.png" id="16_damage"]
+[ext_resource type="Texture2D" uid="uid://bodykjedneero" path="res://assets/sprites/boss.png" id="17_qocgv"]
+[ext_resource type="Texture2D" uid="uid://ct2ixn17bviul" path="res://assets/sprites/bossSad.png" id="17_sad1"]
+[ext_resource type="Texture2D" uid="uid://b62en5twuotlx" path="res://assets/sprites/sad2.png" id="18_sad2"]
+[ext_resource type="Texture2D" uid="uid://c6xqdbiftqoq4" path="res://assets/sprites/profile2.png" id="19_prof1"]
+[ext_resource type="Texture2D" uid="uid://3bs8xup2xyjo" path="res://assets/sprites/profile.png" id="20_prof2"]
+[ext_resource type="Texture2D" uid="uid://cr8rb4tntg46o" path="res://assets/sprites/pow.png" id="21_pow1"]
+[ext_resource type="Texture2D" uid="uid://3ovtg4kyxbl8" path="res://assets/sprites/slash.png" id="22_pow2"]
+[ext_resource type="Texture2D" uid="uid://duucdd2dmc6ej" path="res://assets/sprites/pow2.png" id="23_slash"]
+[ext_resource type="Texture2D" uid="uid://cccwv42rxc7qa" path="res://assets/sprites/boss1.png" id="24_boss1"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_enemy"]
 animations = [{
@@ -63,10 +73,76 @@ animations = [{
 "name": &"idle",
 "speed": 4.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_sad1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_sad2")
+}],
 "loop": true,
-"name": &"new_animation",
-"speed": 5.0
+"name": &"normal",
+"speed": 3.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_boss"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_sad1")
+}],
+"loop": true,
+"name": &"cry",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_8f6io")
+}],
+"loop": false,
+"name": &"dizzy",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("24_boss1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_bug7f")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_qocgv")
+}],
+"loop": true,
+"name": &"normal",
+"speed": 3.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_spell"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("23_slash")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_pow1")
+}],
+"loop": false,
+"name": &"pow",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("22_pow2")
+}],
+"loop": false,
+"name": &"slash",
+"speed": 6.0
 }]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_pip2"]
@@ -83,27 +159,45 @@ animations = [{
 "speed": 8.0
 }]
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_profile"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("19_prof1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_prof2")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 3.0
+}]
+
 [node name="Combat" type="Node2D" unique_id=1284406082]
 script = ExtResource("1_combat")
 
 [node name="Sky" type="Sprite2D" parent="." unique_id=1804928625]
-position = Vector2(480, 180)
-scale = Vector2(0.4, 0.4)
+position = Vector2(479.5, 266)
+scale = Vector2(0.40635595, 0.40670216)
 texture = ExtResource("2_sky")
 
-[node name="Grass" type="Sprite2D" parent="." unique_id=1608042225]
-position = Vector2(480, 460)
-scale = Vector2(8, 1.5)
-texture = ExtResource("3_grass")
-
 [node name="Enemy" type="AnimatedSprite2D" parent="." unique_id=841868721]
+visible = false
 position = Vector2(480, 320)
 scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_enemy")
-animation = &"dead"
+animation = &"idle"
 autoplay = "idle"
-frame = 5
-frame_progress = 1.0
+
+[node name="BossTemplate" type="AnimatedSprite2D" parent="." unique_id=841868723]
+visible = false
+position = Vector2(480, 320)
+scale = Vector2(0.8, 0.8)
+sprite_frames = SubResource("SpriteFrames_boss")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="EnemyLayer" type="Node2D" parent="." unique_id=841868722]
 
 [node name="Damage" type="Sprite2D" parent="." unique_id=1183122299]
 visible = false
@@ -111,30 +205,52 @@ position = Vector2(480, 270)
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("16_damage")
 
+[node name="SpellEffect" type="AnimatedSprite2D" parent="." unique_id=1183122300]
+visible = false
+position = Vector2(480, 320)
+scale = Vector2(0.8, 0.8)
+sprite_frames = SubResource("SpriteFrames_spell")
+animation = &"pow"
+
 [node name="UI" type="CanvasLayer" parent="." unique_id=511768640]
 
+[node name="hp lable" type="ColorRect" parent="UI" unique_id=1280457947]
+offset_left = 15.0
+offset_top = 19.0
+offset_right = 229.0
+offset_bottom = 159.0
+color = Color(0.05, 0.05, 0.12, 0.75)
+
 [node name="HopeLabel" type="Label" parent="UI" unique_id=663110488]
-offset_left = 20.0
-offset_top = 20.0
-offset_right = 200.0
-offset_bottom = 50.0
+offset_left = 48.0
+offset_top = 58.0
+offset_right = 228.0
+offset_bottom = 88.0
 theme_override_font_sizes/font_size = 22
 text = "HOPE: 0"
 
 [node name="PlayerHPLabel" type="Label" parent="UI" unique_id=2122134164]
-offset_left = 20.0
-offset_top = 50.0
-offset_right = 240.0
-offset_bottom = 80.0
+offset_left = 48.0
+offset_top = 88.0
+offset_right = 268.0
+offset_bottom = 118.0
 theme_override_colors/font_color = Color(1, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 20
 text = "HP: 20/20"
 
+[node name="hp lable2" type="ColorRect" parent="UI/PlayerHPLabel" unique_id=331898920]
+layout_mode = 0
+offset_left = 687.0
+offset_top = -66.0
+offset_right = 894.0
+offset_bottom = 74.0
+color = Color(0.05, 0.05, 0.12, 0.75)
+
 [node name="EnemyHPLabel" type="Label" parent="UI" unique_id=506177099]
-offset_left = 740.0
-offset_top = 20.0
-offset_right = 940.0
-offset_bottom = 50.0
+offset_left = 724.0
+offset_top = 72.0
+offset_right = 924.0
+offset_bottom = 102.0
 theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
 theme_override_font_sizes/font_size = 20
 text = "Enemy: 4/4"
@@ -188,11 +304,6 @@ offset_bottom = 510.0
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="LightBtn" type="Button" parent="UI/SpellButtons" unique_id=1597221965]
-custom_minimum_size = Vector2(120, 40)
-layout_mode = 2
-text = "Light"
-
 [node name="ShineBtn" type="Button" parent="UI/SpellButtons" unique_id=796049854]
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
@@ -222,8 +333,118 @@ custom_minimum_size = Vector2(180, 40)
 layout_mode = 2
 text = "Walk on"
 
-[connection signal="pressed" from="UI/SpellButtons/LightBtn" to="." method="_on_light_pressed"]
+[node name="Reticle" type="Label" parent="UI" unique_id=-2094967295]
+offset_right = 30.0
+offset_bottom = 30.0
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 28
+text = "▼"
+horizontal_alignment = 1
+
+[node name="PipActionLabel" type="Label" parent="UI" unique_id=-2094967294]
+offset_left = 280.0
+offset_top = 420.0
+offset_right = 680.0
+offset_bottom = 450.0
+theme_override_colors/font_color = Color(1, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="RunButton" type="Button" parent="UI" unique_id=-2094967293]
+offset_left = 793.0
+offset_top = 110.0
+offset_right = 923.0
+offset_bottom = 145.0
+theme_override_font_sizes/font_size = 18
+text = "Run"
+
+[node name="ProfilePanel" type="ColorRect" parent="UI" unique_id=-2094967286]
+offset_left = 690.0
+offset_top = 390.0
+offset_right = 950.0
+offset_bottom = 530.0
+color = Color(0.05, 0.05, 0.12, 0.75)
+
+[node name="ProfileBorder" type="ColorRect" parent="UI" unique_id=-2094967285]
+offset_left = 690.0
+offset_top = 390.0
+offset_right = 950.0
+offset_bottom = 393.0
+color = Color(0.7, 0.95, 1, 0.9)
+
+[node name="Profile" type="AnimatedSprite2D" parent="UI" unique_id=-2094967284]
+position = Vector2(750, 460)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_profile")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="ProfileName" type="Label" parent="UI" unique_id=-2094967283]
+offset_left = 800.0
+offset_top = 410.0
+offset_right = 945.0
+offset_bottom = 440.0
+theme_override_colors/font_color = Color(0.85, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "You"
+
+[node name="ActorTurnLabel" type="Label" parent="UI" unique_id=-2094967282]
+offset_left = 800.0
+offset_top = 440.0
+offset_right = 945.0
+offset_bottom = 470.0
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Your turn"
+
+[node name="PipChoiceButtons" type="HBoxContainer" parent="UI" unique_id=-2094967281]
+visible = false
+offset_left = 280.0
+offset_top = 460.0
+offset_right = 680.0
+offset_bottom = 510.0
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EnchantBtn" type="Button" parent="UI/PipChoiceButtons" unique_id=-2094967280]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+text = "Enchant (+dmg)"
+
+[node name="CheerBtn" type="Button" parent="UI/PipChoiceButtons" unique_id=-2094967279]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+text = "Cheer (+HP)"
+
+[node name="EndingPanel" type="ColorRect" parent="UI" unique_id=-2094967292]
+offset_right = 960.0
+offset_bottom = 540.0
+color = Color(0.02, 0.02, 0.06, 0.92)
+
+[node name="Text" type="Label" parent="UI/EndingPanel" unique_id=-2094967291]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 80.0
+offset_right = 880.0
+offset_bottom = 420.0
+theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Continue" type="Button" parent="UI/EndingPanel" unique_id=-2094967290]
+layout_mode = 0
+offset_left = 410.0
+offset_top = 450.0
+offset_right = 550.0
+offset_bottom = 490.0
+theme_override_font_sizes/font_size = 18
+text = "Continue"
+
 [connection signal="pressed" from="UI/SpellButtons/ShineBtn" to="." method="_on_shine_pressed"]
 [connection signal="pressed" from="UI/SpellButtons/PurifyBtn" to="." method="_on_purify_pressed"]
 [connection signal="pressed" from="UI/ChoiceButtons/ListenBtn" to="." method="_on_listen_pressed"]
 [connection signal="pressed" from="UI/ChoiceButtons/WalkBtn" to="." method="_on_walk_pressed"]
+[connection signal="pressed" from="UI/PipChoiceButtons/EnchantBtn" to="." method="_on_enchant_pressed"]
+[connection signal="pressed" from="UI/PipChoiceButtons/CheerBtn" to="." method="_on_cheer_pressed"]

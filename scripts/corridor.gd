@@ -23,10 +23,15 @@ const INTRO_LINES := [
 	"Hold the right arrow key to walk — your light will save us!",
 ]
 
+const DIALOG_REVEAL_DELAY := 0.04
+
 var dialog_index: int = 0
 var can_walk: bool = false
 var transitioning: bool = false
 var enemies: Array = []
+var revealing: bool = false
+var current_line: String = ""
+var reveal_gen: int = 0
 
 func _ready() -> void:
 	player.play("walk")
@@ -45,9 +50,14 @@ func _spawn_enemies() -> void:
 	if n <= 0:
 		cry_template.queue_free()
 		return
+	var is_boss: bool = GameState.is_boss_next()
 	cry_template.position = Vector2(enemy_spawn_x, 430)
 	cry_template.visible = true
 	cry_template.play("cry")
+	if is_boss:
+		cry_template.scale = Vector2(1.6, 1.6)
+		cry_template.modulate = Color(0.5, 0.45, 0.55)
+		cry_template.position.y = 410
 	enemies.append(cry_template)
 	for i in range(1, n):
 		var e: AnimatedSprite2D = cry_template.duplicate()
@@ -68,11 +78,13 @@ func _process(delta: float) -> void:
 		_scroll_world(dx)
 		if not player.is_playing():
 			player.play("walk")
+		Audio.play_walk()
 		walk_prompt.visible = false
 		if enemies.size() > 0 and enemies[0].position.x <= player.position.x + collision_offset:
 			_trigger_encounter()
 	else:
 		player.pause()
+		Audio.stop_walk()
 		walk_prompt.visible = true
 
 func _scroll_world(dx: float) -> void:
@@ -88,9 +100,35 @@ func _show_dialog_line(i: int) -> void:
 	dialog_index = i
 	dialog.visible = true
 	dialog_speaker.text = "Pip"
-	dialog_text.text = INTRO_LINES[i]
+	current_line = INTRO_LINES[i]
+	_reveal_dialog(current_line)
+
+func _reveal_dialog(line: String) -> void:
+	reveal_gen += 1
+	var my_gen: int = reveal_gen
+	revealing = true
+	dialog_text.text = ""
+	if line.length() > 0:
+		Audio.start_speak()
+	for j in line.length():
+		if my_gen != reveal_gen:
+			return
+		dialog_text.text = line.substr(0, j + 1)
+		await get_tree().create_timer(DIALOG_REVEAL_DELAY).timeout
+	if my_gen != reveal_gen:
+		return
+	Audio.stop_speak()
+	revealing = false
 
 func _on_next_pressed() -> void:
+	if revealing:
+		# Skip to end of current line.
+		reveal_gen += 1
+		revealing = false
+		Audio.stop_speak()
+		dialog_text.text = current_line
+		Audio.play_sfx("tap")
+		return
 	Audio.play_sfx("tap")
 	dialog_index += 1
 	if dialog_index >= INTRO_LINES.size():
@@ -108,5 +146,6 @@ func _trigger_encounter() -> void:
 	if transitioning:
 		return
 	transitioning = true
+	Audio.stop_walk()
 	Audio.play_sfx("jump")
 	get_tree().change_scene_to_file("res://scenes/combat.tscn")

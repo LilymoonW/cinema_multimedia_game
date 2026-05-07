@@ -12,8 +12,12 @@ const SFX := {
 }
 
 const MUSIC_PATH := "res://assets/music/time_for_adventure.mp3"
+const WALK_PATH := "res://assets/sounds/walk.mp3"
+const SPEAK_PATH := "res://assets/sounds/speak.mp3"
 
 var _music: AudioStreamPlayer
+var _walk: AudioStreamPlayer
+var _speak: AudioStreamPlayer
 var _sfx_pool: Array[AudioStreamPlayer] = []
 var _sfx_cache: Dictionary = {}
 const POOL_SIZE := 6
@@ -27,6 +31,22 @@ func _ready() -> void:
 		(stream as AudioStreamMP3).loop = true
 	_music.stream = stream
 	add_child(_music)
+	_walk = AudioStreamPlayer.new()
+	_walk.bus = "Master"
+	_walk.volume_db = -6.0
+	var walk_stream: AudioStream = load(WALK_PATH)
+	if walk_stream is AudioStreamMP3:
+		(walk_stream as AudioStreamMP3).loop = true
+	_walk.stream = walk_stream
+	add_child(_walk)
+	_speak = AudioStreamPlayer.new()
+	_speak.bus = "Master"
+	_speak.volume_db = -6.0
+	var speak_stream: AudioStream = load(SPEAK_PATH)
+	if speak_stream is AudioStreamMP3:
+		(speak_stream as AudioStreamMP3).loop = true
+	_speak.stream = speak_stream
+	add_child(_speak)
 	for i in range(POOL_SIZE):
 		var p := AudioStreamPlayer.new()
 		add_child(p)
@@ -40,6 +60,22 @@ func play_music() -> void:
 
 func stop_music() -> void:
 	_music.stop()
+
+func play_walk() -> void:
+	if not _walk.playing:
+		_walk.play()
+
+func stop_walk() -> void:
+	if _walk.playing:
+		_walk.stop()
+
+func start_speak() -> void:
+	if not _speak.playing:
+		_speak.play()
+
+func stop_speak() -> void:
+	if _speak.playing:
+		_speak.stop()
 
 func play_sfx(name: String, volume_db: float = 0.0) -> void:
 	var stream: AudioStream = _sfx_cache.get(name)
