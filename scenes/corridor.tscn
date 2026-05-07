@@ -1,0 +1,84 @@
+[gd_scene load_steps=11 format=3 uid="uid://b2corridor1"]
+
+[ext_resource type="Script" path="res://scripts/corridor.gd" id="1_corridor"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/sky.png" id="2_sky"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/grass.png" id="3_grass"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tree.png" id="4_tree"]
+[ext_resource type="Texture2D" path="res://assets/sprites/walk.png" id="5_walk1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/walk2.png" id="6_walk2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sparkle1.png" id="7_spark1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sparkle2.png" id="8_spark2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_player"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_walk1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_walk2")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 6.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pip"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_spark1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_spark2")
+}],
+"loop": true,
+"name": &"sparkle",
+"speed": 8.0
+}]
+
+[node name="Corridor" type="Node2D"]
+script = ExtResource("1_corridor")
+
+[node name="Parallax" type="Node2D" parent="."]
+
+[node name="Sky" type="Sprite2D" parent="Parallax"]
+position = Vector2(480, 180)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2_sky")
+
+[node name="Grass" type="Sprite2D" parent="Parallax"]
+position = Vector2(480, 460)
+scale = Vector2(8, 1.5)
+texture = ExtResource("3_grass")
+
+[node name="Trees" type="Node2D" parent="Parallax"]
+
+[node name="Tree1" type="Sprite2D" parent="Parallax/Trees"]
+position = Vector2(700, 380)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("4_tree")
+
+[node name="Tree2" type="Sprite2D" parent="Parallax/Trees"]
+position = Vector2(1100, 390)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("4_tree")
+
+[node name="Tree3" type="Sprite2D" parent="Parallax/Trees"]
+position = Vector2(1500, 380)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("4_tree")
+
+[node name="Player" type="AnimatedSprite2D" parent="."]
+position = Vector2(280, 380)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_player")
+animation = &"walk"
+autoplay = "walk"
+
+[node name="Pip" type="AnimatedSprite2D" parent="."]
+position = Vector2(360, 320)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_pip")
+animation = &"sparkle"
+autoplay = "sparkle"

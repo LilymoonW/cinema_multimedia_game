@@ -1,0 +1,139 @@
+[gd_scene load_steps=12 format=3 uid="uid://b3combat1"]
+
+[ext_resource type="Script" path="res://scripts/combat.gd" id="1_combat"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/sky.png" id="2_sky"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/grass.png" id="3_grass"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy1.png" id="4_e1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy2.png" id="5_e2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sad.png" id="6_sad1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sad2.png" id="7_sad2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/dead.png" id="8_dead"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sparkle1.png" id="9_spark1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sparkle2.png" id="10_spark2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_enemy"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_e1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_e2")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_sad1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_sad2")
+}],
+"loop": true,
+"name": &"sad",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_dead")
+}],
+"loop": false,
+"name": &"dead",
+"speed": 1.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pip2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_spark1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_spark2")
+}],
+"loop": true,
+"name": &"sparkle",
+"speed": 8.0
+}]
+
+[node name="Combat" type="Node2D"]
+script = ExtResource("1_combat")
+
+[node name="Sky" type="Sprite2D" parent="."]
+position = Vector2(480, 180)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2_sky")
+
+[node name="Grass" type="Sprite2D" parent="."]
+position = Vector2(480, 460)
+scale = Vector2(8, 1.5)
+texture = ExtResource("3_grass")
+
+[node name="Enemy" type="AnimatedSprite2D" parent="."]
+position = Vector2(480, 320)
+scale = Vector2(0.8, 0.8)
+sprite_frames = SubResource("SpriteFrames_enemy")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Pip" type="AnimatedSprite2D" parent="."]
+position = Vector2(820, 140)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_pip2")
+animation = &"sparkle"
+autoplay = "sparkle"
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HopeLabel" type="Label" parent="UI"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 200.0
+offset_bottom = 50.0
+text = "HOPE: 0"
+theme_override_font_sizes/font_size = 22
+
+[node name="PipText" type="Label" parent="UI"]
+offset_left = 600.0
+offset_top = 80.0
+offset_right = 940.0
+offset_bottom = 130.0
+text = "Defeat the corruption!"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="Narration" type="Label" parent="UI"]
+offset_left = 100.0
+offset_top = 380.0
+offset_right = 860.0
+offset_bottom = 420.0
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.9, 0.7, 1)
+
+[node name="SpellButtons" type="HBoxContainer" parent="UI"]
+offset_left = 280.0
+offset_top = 460.0
+offset_right = 680.0
+offset_bottom = 510.0
+alignment = 1
+theme_override_constants/separation = 16
+
+[node name="LightBtn" type="Button" parent="UI/SpellButtons"]
+custom_minimum_size = Vector2(120, 40)
+text = "Light"
+
+[node name="ShineBtn" type="Button" parent="UI/SpellButtons"]
+custom_minimum_size = Vector2(120, 40)
+text = "Shine"
+
+[node name="PurifyBtn" type="Button" parent="UI/SpellButtons"]
+custom_minimum_size = Vector2(120, 40)
+text = "Purify"
+
+[connection signal="pressed" from="UI/SpellButtons/LightBtn" to="." method="_on_spell_pressed"]
+[connection signal="pressed" from="UI/SpellButtons/ShineBtn" to="." method="_on_spell_pressed"]
+[connection signal="pressed" from="UI/SpellButtons/PurifyBtn" to="." method="_on_spell_pressed"]
