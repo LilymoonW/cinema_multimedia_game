@@ -1,64 +1,109 @@
-# Shadow Quest — A Quick Godot Game for my Cinema Creative Project
+# Shadow Quest
+
 
 > *"A hero's journey to eradicate the shadows."*
 
 ![Title screen](screenshots/title.png)
 
-A short, cute Godot game built for a Cinema Creative Project. It looks like a sparkly fairy-tale about a chosen hero, a magical companion, and a corrupted world that needs purifying. It is not.
+A short Godot game made for a Cinema Creative Project. On the surface, it looks like a soft fantasy story about a chosen hero, a magical companion, and a corrupted world that needs saving.
 
 ---
 
 ## The Setup
 
-You play a small, soft-looking character woken up by Pip — a tiny sparkling spirit who tells you the world is in danger and that you've been chosen to cleanse it. Pip is friendly, encouraging, and absolutely certain. The intro sets the tone exactly the way the genre always does:
+![boss](assets/sprites/boss.png)
+![boss alternative form](assets/sprites/boss1.png)
+![walk](assets/sprites/walk.png)
+
+
+You play as a small, cute-looking character woken up by Pip, a tiny sparkling spirit who tells you the world is in danger and that you've been chosen to cleanse it. Pip is friendly, encouraging, and constantly reminds you that the "Shadows" are corrupt and dangerous.
+
+The intro sets the tone exactly like the kinds of games you've seen before:
 
 > *"Hi, I've been waiting for your appearance."*
 > *"The world is in danger of corrupt individuals."*
 > *"Hold the right arrow key to walk and purify enemies!"*
 
-That's the story you're handed. The rest of the game is about whether you take it.
+That is the story the game hands you.
+
+The rest of the game is about whether you believe it.
 
 ![Walking through the world](screenshots/walking.png)
 
-Walk to the right. The world scrolls. Soft pinks and purples, a tree, distant clouds, and small dark blob-shapes ahead. They are the "Shadows."
+You walk to the right through a soft pastel world filled with clouds, trees, and glowing colors. Ahead of you are small dark figures called the Shadows.
 
 ---
 
-## How it Plays
+## Gameplay
 
-The game is structured as four encounters: **1 shadow → 2 shadows → 4 shadows → 1 boss.**
+The game is structured around four encounters:
 
-Combat is a tiny turn-based battle screen, modeled on RPG menus you've seen a hundred times. Each round goes:
+**1 shadow → 2 shadows → 4 shadows → 1 boss**
 
-1. **Pip's turn.** You pick what Pip does — *Cheer* (buff your next strike) or *Heal* (restore HP).
-2. **Your turn.** *Fight* or *Run*. If you fight, you pick a spell — *Shine* or *Purify* — and a target. Pip tells you which spell to use; using the "wrong" one makes Pip upset, then angry.
-3. **Enemy turn.** They hit back. Weakly.
+Combat is a small turn-based RPG battle screen inspired by classic menu-based games.
 
-Every shadow you kill grants **+1 HOPE**. The HUD literally tracks your moral progress as a number that goes up when you kill.
+Each round goes like this:
+
+1. **Pip's turn**
+
+   * *Cheer* buffs your next attack
+   * *Heal* restores HP
+
+2. **Your turn**
+
+   * *Fight* or *Run*
+   * If you fight, you choose between:
+
+     * *Shine*
+     * *Purify*
+
+Pip tells you which spell to use. Using the "wrong" one makes Pip irritated, then angry.
+
+3. **Enemy turn**
+
+   * The shadows attack back.
+   * Weakly.
+
+Every enemy you kill gives you **+1 HOPE**.
 
 ![Battle screen](screenshots/battle.png)
 
-After each fight, the game pauses and asks one quiet question: *"...will you look at what's left of them?"* You can **Observe** or **Walk away**. Observing reveals what was actually there. Walking lets you keep moving without seeing it.
+After each fight, the game pauses and asks:
+
+> *"...will you look at what's left of them?"*
+
+You can choose:
+
+* **Observe**
+* **Walk away**
+
+Observing reveals what was actually there. Walking away lets you keep moving without seeing it.
 
 ---
 
-## The Storyline (what you're really watching)
+## What the Story Is Actually About
 
-The shadows die easily. Suspiciously easily. And whenever one falls, the game lets a single line slip past Pip's cheering:
+The shadows die very easily. A little too easily.
+
+And every time one falls, the game lets something slip through Pip's narration:
 
 > *"...mother..."*
 > *"...we were just—"*
 > *"...is anyone going to remember—"*
 
-If you Observe after the fight, the picture sharpens further:
+If you choose to Observe after battle, things become clearer:
 
 > *"A small wooden charm rests in the dirt. A child's name, carved badly."*
 > *"Two of them fell holding each other. You hadn't noticed before."*
 > *"They look pitiful, malnourished. You doubt they are of any harm."*
 
-Pip immediately cuts in to dismiss what you saw — *"Don't. Don't look so long, hero. They were Shadows."* — and pushes you back onto the road.
+Pip immediately interrupts and pushes you forward:
 
-The boss fight makes the trick explicit. The "vast Shadow" flickers between forms. While it's flickering, it speaks:
+> *"Don't. Don't look so long, hero. They were Shadows."*
+
+The boss fight makes everything explicit.
+
+The "vast Shadow" flickers between forms while speaking:
 
 > *"...please... I haven't seen my—"*
 > *"...my name was—"*
@@ -66,54 +111,56 @@ The boss fight makes the trick explicit. The "vast Shadow" flickers between form
 > *"...the light... the light hurts..."*
 > *"...you don't have to do this..."*
 
-And Pip — the cheerful sparkle — turns. *"That's not real. I'M real. Hit it!"* *"It will say ANYTHING to stop you. END IT!"*
+And Pip responds:
 
-If you defeat the boss, a folded letter falls in the dust. Pip begs you not to read it. If you do:
+> *"That's not real. I'M real. Hit it!"*
+> *"It will say ANYTHING to stop you. END IT!"*
+
+If you defeat the boss, a folded letter falls into the dust. Pip asks you not to read it.
+
+If you do, it says:
 
 > *"All we wanted was to have a better life here. It was for a better life for me and my children, but they slowly turned against us, blaming us for famine and disease. We had no option to run, hide, and fight."*
 
-The "monsters" were a family running from people exactly like you.
+The monsters were never monsters.
 
 ---
 
-## The Parable
+## The Allegory
 
-This game is a **parable** — a short story whose surface plot exists to deliver a moral lesson, the way *The Good Samaritan* or *The Boy Who Cried Wolf* do. The lesson here, in plain terms:
+Underneath the fantasy setup, the game is also an allegory about scapegoating.
 
-> **A friendly voice telling you who deserves to die is still a voice telling you who deserves to die. The fact that it sparkles does not make it right.**
+More specifically, it is about the way famine, disease, and hardship are often blamed on outsiders, refugees, or vulnerable groups, and how propaganda convinces ordinary people to participate in violence against them.
 
-Every mechanic is built to teach that lesson rather than decorate around it:
+The boss letter reveals the truth:
 
-- **HOPE goes up when you kill.** The thing the game calls virtue is, mechanically, just a kill counter. Salvation is being *measured in bodies*. The number is meant to feel a little wrong by the third encounter.
-- **Pip is the propagandist, not the guide.** Pip is bright, cute, encouraging, and constantly *redirects your attention* — away from the dying creatures, away from what they say, away from the option to leave. The game's whole UI is Pip's UI. The "wrong" spell, the "right" target, what a hero "should" do — all of it is Pip's framing.
-- **Observe vs. Walk is the real choice.** Combat is rigged in your favor. The actual decision the game cares about is whether you are willing to *look* at what you just did. Choosing to observe doesn't even change the fight you just won — it only changes you.
-- **The boss "flashes" are doubt.** The game gives you doubt for free, repeatedly, and shows you Pip working to suppress it in real time. If you've ever seen a person be told their own perception isn't real, the dialog is going to feel familiar.
+> *"They slowly turned against us, blaming us for famine and disease."*
 
-## The Allegory underneath it
+The "Shadows" are not monsters. They are people who were displaced, starving, and hunted after being labeled dangerous.
 
-Layered on top of the parable is an **allegory about scapegoating** — specifically the way famine, plague, and hardship get blamed on outsiders, and how propaganda enlists ordinary people to do the violence. The boss's letter is the giveaway: it's not a fantasy monster's last words, it's a refugee's. *"They slowly turned against us, blaming us for famine and disease."* The "Shadows" are a people who were running, were hungry, were called corrupt, and were killed by a hero who'd been told a story.
+Pip is intentionally designed to be the least suspicious figure in the game.
 
-Pip — the **bright** one, the **light**, the **sparkle** — is the part of that allegory the player is most reluctant to suspect. That's the point. The thing that calls itself the light is the thing telling you to stop looking.
+Bright. Cute. Sparkling. The "light."
 
----
-
-## The Endings
-
-Your choices steer you to one of four endings. The branch is simple — *did you kill anyone before the boss?* and *did you fight the boss or walk away?* — but each ending reframes the whole run:
-
-- **Pacifist** — you walk away from the very first fight. The world doesn't end. Pip's voice goes thin behind you. You keep walking.
-- **Boss-only** — you spared every shadow on the road, and only the one at the end fell, holding a letter. You're left questioning whether the world was the thing that needed saving.
-- **Walkaway-with-regret** — you killed your way to the boss and then turned around at the last moment. The road behind you is full. Pip's light dims, sharpens, and *finds someone new*.
-- **Massacre** — you did everything Pip asked. There is nothing left. *"At least Pip is happy."*
-
-There is no "good" ending in the sense the genre normally means it. There is only the ending that matches what you were willing to see.
+The thing calling itself the light is also the thing telling you not to look too closely.
 
 ---
 
-## Why I made it like this
+## Endings
+- Pacifist
+- Boss Only
+- Walk Away With Regret
+- Massacre
 
-In class we were talking about parables and allegories, and we had an exercise to write one. I kept thinking about how games — especially the cute, colorful ones — are very good at quietly teaching you that some lives are worth points. I wanted to make a tiny version of that and then let the player feel where it pinches.
+---
 
-The art is intentionally soft and adorable, inspired by games like *Omori* and *Undertale* and the kind of subversive turns you get in a good Black Mirror episode. I don't actually play many games myself — I watch a lot of streams — so this is also a small love letter to a genre I mostly know from the outside, which is maybe why it was easier to see the shape of it.
+## Why I Made This
 
-It's a short, simple project. But the mechanics aren't separate from the message — they *are* the message.
+In class, we were talking about parables and allegories, and we had an exercise where we wrote a shrot one in class. One of the mediums was through games which I thought was a underused platform to communicate this type of story. I wanted to make a game where it subverts your expectations and makes the player slowly feel more uncomfortable with the situation. 
+
+It was inspired by games like Omori and Undertale, along with the kind of tonal shifts you get in Black Mirror episodes.
+
+I actually do not play many games myself. I mostly watch streams and video essays, which honestly might be why it was easier for me to notice the structure behind these kinds of mechanics.
+
+The project itself is short and simple, but I wanted the mechanics and the message to be pretty clear.
+
