@@ -13,6 +13,7 @@
 [ext_resource type="Texture2D" uid="uid://bbml57tu5k301" path="res://assets/sprites/enemy1.png" id="10_f323m"]
 [ext_resource type="Texture2D" uid="uid://8mbaa1j78p3x" path="res://assets/sprites/enemy2.png" id="11_so7gr"]
 [ext_resource type="Texture2D" uid="uid://tu7w1g8orwi6" path="res://assets/backgrounds/ground_top.png" id="12_groundtop"]
+[ext_resource type="Texture2D" uid="uid://by2lrwxqq3h2y" path="res://assets/backgrounds/grass.png" id="13_grass"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
@@ -88,11 +89,53 @@ region_rect = Rect2(0, 0, 4000, 50)
 
 [node name="Ground" type="Sprite2D" parent="Parallax" unique_id=1803718616]
 texture_repeat = 2
-position = Vector2(2, 497)
+position = Vector2(1, 497)
 texture = ExtResource("9_ground")
 centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 4000, 70)
+
+[node name="Tufts" type="Node2D" parent="Parallax" unique_id=546937060]
+
+[node name="Tuft1" type="Sprite2D" parent="Parallax/Tufts" unique_id=1018306626]
+position = Vector2(180, 440)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("13_grass")
+
+[node name="Tuft2" type="Sprite2D" parent="Parallax/Tufts" unique_id=1202409398]
+position = Vector2(360, 442)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("13_grass")
+
+[node name="Tuft3" type="Sprite2D" parent="Parallax/Tufts" unique_id=450704154]
+position = Vector2(620, 440)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("13_grass")
+
+[node name="Tuft4" type="Sprite2D" parent="Parallax/Tufts" unique_id=393116231]
+position = Vector2(900, 444)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("13_grass")
+
+[node name="Tuft5" type="Sprite2D" parent="Parallax/Tufts" unique_id=299195933]
+position = Vector2(1180, 440)
+scale = Vector2(0.65, 0.65)
+texture = ExtResource("13_grass")
+
+[node name="Tuft6" type="Sprite2D" parent="Parallax/Tufts" unique_id=691896815]
+position = Vector2(1460, 442)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("13_grass")
+
+[node name="Tuft7" type="Sprite2D" parent="Parallax/Tufts" unique_id=904902847]
+position = Vector2(1740, 440)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("13_grass")
+
+[node name="Tuft8" type="Sprite2D" parent="Parallax/Tufts" unique_id=382505158]
+position = Vector2(2020, 444)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("13_grass")
 
 [node name="Trees" type="Node2D" parent="Parallax" unique_id=546937055]
 
@@ -134,16 +177,23 @@ autoplay = "idle"
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1921867508]
 
+[node name="WalkPromptBg" type="ColorRect" parent="UI" unique_id=636019959]
+offset_left = 178.0
+offset_top = 55.0
+offset_right = 805.0
+offset_bottom = 115.0
+color = Color(0.15, 0.15, 0.18, 0.75)
+
 [node name="WalkPrompt" type="Label" parent="UI" unique_id=636019958]
-visible = false
-offset_left = 240.0
-offset_top = 60.0
-offset_right = 720.0
-offset_bottom = 100.0
+offset_left = 198.0
+offset_top = 65.0
+offset_right = 785.0
+offset_bottom = 105.0
 theme_override_colors/font_color = Color(1, 0.95, 0.6, 1)
 theme_override_font_sizes/font_size = 22
 text = "▶ Hold the RIGHT ARROW key to walk"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="DialogBox" type="Control" parent="UI" unique_id=1320283832]
 layout_mode = 3

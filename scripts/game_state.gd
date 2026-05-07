@@ -5,7 +5,7 @@ extends Node
 var encounter_index: int = 0
 var hope: int = 0
 # Tracks the player's choices after each encounter. Read by the boss fight
-# to branch dialog and ending: high = the cries reached you, low = you didn't listen.
+# to branch dialog and ending: high = you saw them as people, low = you looked away.
 var compassion: int = 0
 var ran_from_boss: bool = false
 var beat_boss: bool = false
@@ -21,9 +21,9 @@ func reset_run() -> void:
 	ran_from_boss = false
 	beat_boss = false
 
-# Encounter sizes per the design doc: 1, 2, 2, 4, then boss.
-const ENCOUNTER_SIZES := [1, 2, 2, 4]
-const BOSS_INDEX := 4
+# Encounter sizes: 1, 2, 4, then boss.
+const ENCOUNTER_SIZES := [1, 2, 4]
+const BOSS_INDEX := 3
 
 func enemies_for_current_encounter() -> int:
 	if encounter_index < ENCOUNTER_SIZES.size():

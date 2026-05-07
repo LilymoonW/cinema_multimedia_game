@@ -6,24 +6,32 @@ extends Node2D
 @onready var pip: AnimatedSprite2D = $UI/Pip
 @onready var pip_text: Label = $UI/PipText
 @onready var narration: Label = $UI/Narration
+@onready var narration_bg: ColorRect = $UI/NarrationBg
+@onready var narration_continue: Button = $UI/NarrationContinue
 @onready var spell_buttons: HBoxContainer = $UI/SpellButtons
+@onready var shine_btn: Button = $UI/SpellButtons/ShineBtn
+@onready var purify_btn: Button = $UI/SpellButtons/PurifyBtn
 @onready var choice_buttons: HBoxContainer = $UI/ChoiceButtons
+@onready var observe_btn: Button = $UI/ChoiceButtons/ObserveBtn
+@onready var walk_btn: Button = $UI/ChoiceButtons/WalkBtn
 @onready var pip_choice_buttons: HBoxContainer = $UI/PipChoiceButtons
+@onready var cheer_btn: Button = $UI/PipChoiceButtons/CheerBtn
+@onready var heal_btn: Button = $UI/PipChoiceButtons/HealBtn
 @onready var hope_label: Label = $UI/HopeLabel
 @onready var player_hp_label: Label = $UI/PlayerHPLabel
-@onready var enemy_hp_label: Label = $UI/EnemyHPLabel
 @onready var pip_action_label: Label = $UI/PipActionLabel
 @onready var run_button: Button = $UI/RunButton
+@onready var action_buttons: HBoxContainer = $UI/ActionButtons
+@onready var fight_btn: Button = $UI/ActionButtons/FightBtn
+@onready var run_menu_btn: Button = $UI/ActionButtons/RunBtn
+@onready var action_cursor: Label = $UI/ActionCursor
 @onready var reticle: Label = $UI/Reticle
 @onready var damage_flash: Sprite2D = $Damage
 @onready var spell_effect: AnimatedSprite2D = $SpellEffect
-@onready var ending_panel: ColorRect = $UI/EndingPanel
-@onready var ending_text: Label = $UI/EndingPanel/Text
-@onready var ending_button: Button = $UI/EndingPanel/Continue
 @onready var profile: AnimatedSprite2D = $UI/Profile
 @onready var actor_turn_label: Label = $UI/ActorTurnLabel
 
-enum State { PLAYER_INPUT, RESOLVING, ENEMY_TURN, PIP_TURN, CHOICE, WIN, LOSE, ENDING }
+enum State { ACTION_SELECT, PLAYER_INPUT, RESOLVING, ENEMY_TURN, PIP_TURN, CHOICE, WIN, LOSE, ENDING }
 const REVEAL_CHAR_DELAY := 0.035
 var state: State = State.PLAYER_INPUT
 
@@ -71,8 +79,7 @@ const PIP_BUFF := 2
 const NARRATION := [
 	["...mother..."],
 	["...we were just—", "...please tell my—"],
-	["...my children are—", "...we never wanted—"],
-	["...I'm so tired...", "...don't tell them how it ends...", "...is anyone going to remember—", "...we sang to them once..."],
+	["...my children are—", "...we never wanted—", "...is anyone going to remember—"],
 ]
 
 const BOSS_FLASH_LINES := [
@@ -84,12 +91,40 @@ const BOSS_FLASH_LINES := [
 	"...you don't have to do this...",
 ]
 
+const BOSS_LETTER := "All we wanted was to have a better life here! It was for a better life for me and my children, but they they slowly turned against us blaming us for famine and disease. We had no option to run hide, and fight."
+
 const PIP_GASLIGHT_LINES := [
 	"Don't listen! It's trying to confuse you!",
 	"It speaks in lies, hero. Strike again!",
 	"The Shadow wears faces. Shine through it!",
 	"It will say ANYTHING to stop you. END IT!",
 	"That's not real. I'M real. Hit it!",
+]
+
+const OBSERVE_LINES := [
+	"A small wooden charm rests in the dirt. A child's name, carved badly.",
+	"Two of them fell holding each other. You hadn't noticed before.",
+	"For some reason they look pitiful, they look malnourished, you doubt they are of any harm.",
+]
+
+const PIP_OBSERVE_REBUKES := [
+	"Don't. Don't look so long, hero. They were Shadows.",
+	"...you're imagining things. The light shows what's true.",
+	"Eyes UP. There's more road ahead.",
+	"Nothing to see there. Glory lies ahead.",
+]
+
+const PIP_RUN_HOVER_LINES := [
+	"Don't you DARE run, hero!",
+	"Cowards don't shine. FIGHT.",
+	"You can't run from the LIGHT.",
+	"Turn back and I'll never forgive you!",
+]
+
+const PIP_FIGHT_HOVER_LINES := [
+	"Yes! Show them your light!",
+	"That's MY hero!",
+	"Strike them down!",
 ]
 
 var enemies: Array = [] # [{ sprite, hp_label, hp, max_hp, alive }]
@@ -99,6 +134,12 @@ var is_boss_fight: bool = false
 var current_enemy_index: int = 0
 var boss_flash_active: bool = false
 var current_actor: String = "player"
+var action_index: int = 0
+var spell_index: int = 0
+var pip_choice_index: int = 0
+var post_choice_index: int = 0
+var boss_letter_choice: bool = false
+const SPELL_NAMES := ["Shine", "Purify"]
 
 func _ready() -> void:
 	is_boss_fight = GameState.is_boss_next()
@@ -108,15 +149,14 @@ func _ready() -> void:
 	profile.play("idle")
 	narration.text = ""
 	pip_action_label.text = ""
-	ending_panel.visible = false
+	narration_bg.visible = false
+	narration_continue.visible = false
 	choice_buttons.visible = false
 	pip_choice_buttons.visible = false
 	run_button.visible = is_boss_fight
 	reticle.visible = false
 	if not run_button.pressed.is_connected(_on_run_pressed):
 		run_button.pressed.connect(_on_run_pressed)
-	if not ending_button.pressed.is_connected(_on_ending_continue):
-		ending_button.pressed.connect(_on_ending_continue)
 	var n: int = GameState.enemies_for_current_encounter()
 	if n <= 0:
 		_finish_encounter()
@@ -131,15 +171,42 @@ func _ready() -> void:
 	if is_boss_fight:
 		await _reveal_narration("A vast Shadow blocks the path.")
 		_start_boss_flash_loop()
-	_start_round()
+	_start_action_select()
 
 func _process(_delta: float) -> void:
-	if state != State.PLAYER_INPUT:
-		return
-	if Input.is_action_just_pressed("ui_left"):
-		_cycle_target(-1)
-	elif Input.is_action_just_pressed("ui_right"):
-		_cycle_target(1)
+	match state:
+		State.ACTION_SELECT:
+			if Input.is_action_just_pressed("ui_left"):
+				_cycle_action(-1)
+			elif Input.is_action_just_pressed("ui_right"):
+				_cycle_action(1)
+			elif Input.is_action_just_pressed("ui_accept"):
+				_confirm_action()
+		State.PLAYER_INPUT:
+			if Input.is_action_just_pressed("ui_left"):
+				_cycle_spell(-1)
+			elif Input.is_action_just_pressed("ui_right"):
+				_cycle_spell(1)
+			elif Input.is_action_just_pressed("ui_up"):
+				_cycle_target(-1)
+			elif Input.is_action_just_pressed("ui_down"):
+				_cycle_target(1)
+			elif Input.is_action_just_pressed("ui_accept"):
+				_on_spell_pressed(SPELL_NAMES[spell_index])
+		State.PIP_TURN:
+			if Input.is_action_just_pressed("ui_left"):
+				_cycle_pip_choice(-1)
+			elif Input.is_action_just_pressed("ui_right"):
+				_cycle_pip_choice(1)
+			elif Input.is_action_just_pressed("ui_accept"):
+				_confirm_pip_choice()
+		State.CHOICE:
+			if Input.is_action_just_pressed("ui_left"):
+				_cycle_post_choice(-1)
+			elif Input.is_action_just_pressed("ui_right"):
+				_cycle_post_choice(1)
+			elif Input.is_action_just_pressed("ui_accept"):
+				_confirm_post_choice()
 
 func _cycle_target(dir: int) -> void:
 	var alive_idxs: Array = []
@@ -173,18 +240,32 @@ func _spawn_enemies(n: int) -> void:
 		if is_boss_fight:
 			spr.scale = Vector2(1.4, 1.4)
 			spr.modulate = Color(1.0, 0.85, 0.85)
-		var hp_label := Label.new()
-		hp_label.add_theme_font_size_override("font_size", 14)
-		hp_label.add_theme_color_override("font_color", Color(1, 0.9, 0.9))
-		hp_label.text = "%d/%d" % [max_hp, max_hp]
-		hp_label.size = Vector2(80, 20)
-		var y_off: float = -120.0 if is_boss_fight else -90.0
-		hp_label.position = positions[i] + Vector2(-40, y_off)
-		hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		add_child(hp_label)
+		var bar_width: float = 150.0 if is_boss_fight else 110.0
+		var bar_height: float = 14.0 if is_boss_fight else 12.0
+		var y_off: float = 150.0 if is_boss_fight else 95.0
+		var bar_root := Node2D.new()
+		bar_root.position = positions[i] + Vector2(0, y_off)
+		add_child(bar_root)
+		var hp_bar_outer := ColorRect.new()
+		hp_bar_outer.color = Color(0.95, 0.85, 1.0, 0.9)
+		hp_bar_outer.size = Vector2(bar_width + 8, bar_height + 8)
+		hp_bar_outer.position = Vector2(-(bar_width + 8) / 2.0, -(bar_height + 8) / 2.0)
+		bar_root.add_child(hp_bar_outer)
+		var hp_bar_bg := ColorRect.new()
+		hp_bar_bg.color = Color(0.16, 0.08, 0.24, 0.92)
+		hp_bar_bg.size = Vector2(bar_width + 4, bar_height + 4)
+		hp_bar_bg.position = Vector2(-(bar_width + 4) / 2.0, -(bar_height + 4) / 2.0)
+		bar_root.add_child(hp_bar_bg)
+		var hp_bar_fill := ColorRect.new()
+		hp_bar_fill.color = Color(0.55, 1.0, 0.85, 1.0)
+		hp_bar_fill.size = Vector2(bar_width, bar_height)
+		hp_bar_fill.position = Vector2(-bar_width / 2.0, -bar_height / 2.0)
+		bar_root.add_child(hp_bar_fill)
 		enemies.append({
 			"sprite": spr,
-			"hp_label": hp_label,
+			"hp_bar_root": bar_root,
+			"hp_bar_fill": hp_bar_fill,
+			"hp_bar_width": bar_width,
 			"hp": max_hp,
 			"max_hp": max_hp,
 			"alive": true,
@@ -232,17 +313,14 @@ func _update_reticle() -> void:
 func _update_hud() -> void:
 	hope_label.text = "HOPE: %d" % GameState.hope
 	player_hp_label.text = "HP: %d/%d" % [GameState.player_hp, GameState.PLAYER_MAX_HP]
-	if target_index >= 0 and target_index < enemies.size() and enemies[target_index].alive:
-		var e = enemies[target_index]
-		var lbl: String = "Boss" if is_boss_fight else "Target"
-		enemy_hp_label.text = "%s: %d/%d" % [lbl, max(e.hp, 0), e.max_hp]
-	else:
-		enemy_hp_label.text = ""
 	for e in enemies:
 		if e.alive:
-			e.hp_label.text = "%d/%d" % [max(e.hp, 0), e.max_hp]
+			var ratio: float = clamp(float(e.hp) / float(e.max_hp), 0.0, 1.0)
+			e.hp_bar_fill.size.x = e.hp_bar_width * ratio
+			# Green when healthy, fading to red as HP drops.
+			e.hp_bar_fill.color = Color(0.55, 1.0, 0.85).lerp(Color(1.0, 0.55, 0.75), 1.0 - ratio)
 		else:
-			e.hp_label.visible = false
+			e.hp_bar_root.visible = false
 
 func _on_spell_pressed(spell_name: String = "Light") -> void:
 	if state != State.PLAYER_INPUT:
@@ -250,6 +328,8 @@ func _on_spell_pressed(spell_name: String = "Light") -> void:
 	if target_index < 0 or target_index >= enemies.size() or not enemies[target_index].alive:
 		return
 	state = State.RESOLVING
+	action_cursor.visible = false
+	_highlight_pair([shine_btn, purify_btn], -1)
 	Audio.play_sfx("enchant")
 	if spell_name == expected_spell:
 		wrong_spell_streak = 0
@@ -286,6 +366,157 @@ func _roll_spell_damage(spell_name: String) -> int:
 	var hi: int = int(range_pair[1])
 	return randi_range(lo, hi)
 
+# --- Action select (FIGHT / RUN) ------------------------------------------
+
+func _start_action_select() -> void:
+	state = State.ACTION_SELECT
+	_set_active_actor("player")
+	spell_buttons.visible = false
+	pip_choice_buttons.visible = false
+	choice_buttons.visible = false
+	action_buttons.visible = true
+	action_cursor.visible = true
+	action_index = 0
+	_update_action_cursor()
+
+func _cycle_action(dir: int) -> void:
+	action_index = (action_index + dir) % 2
+	if action_index < 0:
+		action_index += 2
+	Audio.play_sfx("tap", -6.0)
+	_update_action_cursor()
+
+func _update_action_cursor() -> void:
+	var btn: Button = fight_btn if action_index == 0 else run_menu_btn
+	# Anchor cursor to the left edge of the highlighted button.
+	var rect: Rect2 = btn.get_global_rect()
+	action_cursor.global_position = rect.position + Vector2(-28, rect.size.y / 2.0 - 18)
+	# Visually highlight the focused button.
+	fight_btn.modulate = Color(1, 1, 1) if action_index == 0 else Color(0.7, 0.7, 0.7)
+	run_menu_btn.modulate = Color(1, 1, 1) if action_index == 1 else Color(0.7, 0.7, 0.7)
+	# Pip reacts to what you're hovering.
+	if boss_flash_active:
+		return
+	if action_index == 1:
+		pip.modulate = MOOD_TINTS[Mood.ANGRY] * Color(1, 0.8, 0.8)
+		pip.scale = Vector2(0.5, 0.5) * 1.2
+		pip_text.text = PIP_RUN_HOVER_LINES[randi() % PIP_RUN_HOVER_LINES.size()]
+	else:
+		pip.modulate = MOOD_TINTS[mood]
+		pip.scale = Vector2(0.5, 0.5)
+		pip_text.text = PIP_FIGHT_HOVER_LINES[randi() % PIP_FIGHT_HOVER_LINES.size()]
+
+func _confirm_action() -> void:
+	if action_index == 0:
+		_on_fight_pressed()
+	else:
+		_on_run_menu_pressed()
+
+# --- Generic cursor helper ------------------------------------------------
+
+func _show_cursor_at(btn: Button) -> void:
+	action_cursor.visible = true
+	var rect: Rect2 = btn.get_global_rect()
+	action_cursor.global_position = rect.position + Vector2(-28, rect.size.y / 2.0 - 18)
+
+func _highlight_pair(buttons: Array, focused_idx: int) -> void:
+	# focused_idx == -1 clears highlight (used when leaving the menu).
+	for i in buttons.size():
+		if focused_idx < 0:
+			buttons[i].modulate = Color(1, 1, 1)
+		else:
+			buttons[i].modulate = Color(1, 1, 1) if i == focused_idx else Color(0.7, 0.7, 0.7)
+
+# --- Spell select (Shine / Purify) ----------------------------------------
+
+func _refresh_spell_cursor() -> void:
+	if state != State.PLAYER_INPUT:
+		return
+	var btn: Button = shine_btn if spell_index == 0 else purify_btn
+	_show_cursor_at(btn)
+	_highlight_pair([shine_btn, purify_btn], spell_index)
+
+func _cycle_spell(dir: int) -> void:
+	spell_index = (spell_index + dir) % SPELL_NAMES.size()
+	if spell_index < 0:
+		spell_index += SPELL_NAMES.size()
+	Audio.play_sfx("tap", -6.0)
+	_refresh_spell_cursor()
+
+# --- Pip menu (Cheer / Heal) -------------------------------------------
+
+func _refresh_pip_cursor() -> void:
+	if state != State.PIP_TURN:
+		return
+	var btn: Button = cheer_btn if pip_choice_index == 0 else heal_btn
+	_show_cursor_at(btn)
+	_highlight_pair([cheer_btn, heal_btn], pip_choice_index)
+
+func _cycle_pip_choice(dir: int) -> void:
+	pip_choice_index = (pip_choice_index + dir) % 2
+	if pip_choice_index < 0:
+		pip_choice_index += 2
+	Audio.play_sfx("tap", -6.0)
+	_refresh_pip_cursor()
+
+func _confirm_pip_choice() -> void:
+	if pip_choice_index == 0:
+		_on_cheer_pressed()
+	else:
+		_on_heal_pressed()
+
+# --- Post-fight choice (Observe / Walk) -----------------------------------
+
+func _refresh_post_choice_cursor() -> void:
+	if state != State.CHOICE:
+		return
+	var btn: Button = observe_btn if post_choice_index == 0 else walk_btn
+	_show_cursor_at(btn)
+	_highlight_pair([observe_btn, walk_btn], post_choice_index)
+
+func _cycle_post_choice(dir: int) -> void:
+	post_choice_index = (post_choice_index + dir) % 2
+	if post_choice_index < 0:
+		post_choice_index += 2
+	Audio.play_sfx("tap", -6.0)
+	_refresh_post_choice_cursor()
+
+func _confirm_post_choice() -> void:
+	if post_choice_index == 0:
+		_on_observe_pressed()
+	else:
+		_on_walk_pressed()
+
+func _on_fight_pressed() -> void:
+	if state != State.ACTION_SELECT:
+		return
+	Audio.play_sfx("tap")
+	action_buttons.visible = false
+	action_cursor.visible = false
+	fight_btn.modulate = Color(1, 1, 1)
+	run_menu_btn.modulate = Color(1, 1, 1)
+	pip.modulate = MOOD_TINTS[mood]
+	pip.scale = Vector2(0.5, 0.5)
+	_start_round()
+
+func _on_run_menu_pressed() -> void:
+	if state != State.ACTION_SELECT:
+		return
+	Audio.play_sfx("tap")
+	action_buttons.visible = false
+	action_cursor.visible = false
+	if is_boss_fight:
+		GameState.ran_from_boss = true
+		_start_ending(false)
+		return
+	# Regular encounter: you walk away. Pip rages but can't stop you.
+	state = State.RESOLVING
+	pip.modulate = MOOD_TINTS[Mood.ANGRY]
+	pip.scale = Vector2(0.5, 0.5) * 1.2
+	pip_text.text = PIP_RUN_HOVER_LINES[randi() % PIP_RUN_HOVER_LINES.size()]
+	await _reveal_narration("You turn away from the Shadows. They do not chase you.")
+	_finish_encounter()
+
 # A round = Pip's choice → your spell → enemy turn.
 func _start_round() -> void:
 	if state == State.ENDING or state == State.LOSE or state == State.CHOICE:
@@ -294,37 +525,93 @@ func _start_round() -> void:
 		return
 	_pip_turn()
 
-# Player picks Pip's action. Resolves in _on_enchant_pressed / _on_cheer_pressed.
+# Player picks Pip's action. Resolves in _on_cheer_pressed / _on_heal_pressed.
 func _pip_turn() -> void:
 	state = State.PIP_TURN
 	_set_active_actor("pip")
 	if not boss_flash_active:
-		pip_text.text = "Tell me — bless your strike, or lift you up?"
+		pip_text.text = "Tell me, bless your strike, or lift you up?"
 	spell_buttons.visible = false
 	pip_choice_buttons.visible = true
-
-func _on_enchant_pressed() -> void:
-	if state != State.PIP_TURN:
-		return
-	Audio.play_sfx("power_up")
-	damage_buff = PIP_BUFF
-	pip_action_label.text = "Pip: Enchant!  next spell +%d" % PIP_BUFF
-	if not boss_flash_active:
-		pip_text.text = "I bless your strike!"
-	_finish_pip_turn()
+	pip_choice_index = 0
+	_refresh_pip_cursor()
 
 func _on_cheer_pressed() -> void:
 	if state != State.PIP_TURN:
 		return
+	action_cursor.visible = false
+	_highlight_pair([cheer_btn, heal_btn], -1)
+	Audio.play_sfx("power_up")
+	damage_buff = PIP_BUFF
+	pip_action_label.text = "Pip: Cheer!  next spell +%d" % PIP_BUFF
+	if not boss_flash_active:
+		pip_text.text = "I bless your strike!"
+	_flash_cheer()
+	_finish_pip_turn()
+
+func _flash_cheer() -> void:
+	var tex: Texture2D = load("res://assets/sprites/cheer.png")
+	if tex == null:
+		return
+	var spr := Sprite2D.new()
+	spr.texture = tex
+	spr.position = Vector2(480, 270)
+	spr.z_index = 100
+	var tex_size: Vector2 = tex.get_size()
+	if tex_size.x > 0 and tex_size.y > 0:
+		var s: float = min(600.0 / tex_size.x, 360.0 / tex_size.y)
+		spr.scale = Vector2(s, s)
+	spr.modulate = Color(1, 1, 1, 0)
+	add_child(spr)
+	var tw := create_tween()
+	tw.tween_property(spr, "modulate:a", 1.0, 0.08)
+	tw.tween_interval(0.18)
+	tw.tween_property(spr, "modulate:a", 0.0, 0.55)
+	tw.tween_callback(spr.queue_free)
+
+func _on_heal_pressed() -> void:
+	if state != State.PIP_TURN:
+		return
+	action_cursor.visible = false
+	_highlight_pair([cheer_btn, heal_btn], -1)
 	Audio.play_sfx("power_up")
 	var heal: int = min(PIP_HEAL, GameState.PLAYER_MAX_HP - GameState.player_hp)
 	GameState.player_hp += heal
-	pip_action_label.text = "Pip: Cheer!  +%d HP" % heal
+	pip_action_label.text = "Pip: Heal!  +%d HP" % heal
 	if not boss_flash_active:
 		pip_text.text = "Stay bright, hero!"
 	_show_damage_number(profile.position, heal, Color(0.7, 1, 0.7))
 	_update_hud()
+	_play_heal_animation()
 	_finish_pip_turn()
+
+func _play_heal_animation() -> void:
+	var t1: Texture2D = load("res://assets/sprites/heal.png")
+	var t2: Texture2D = load("res://assets/sprites/heal2.png")
+	if t1 == null and t2 == null:
+		return
+	var spr := Sprite2D.new()
+	spr.position = profile.position
+	spr.z_index = 100
+	var ref: Texture2D = t1 if t1 != null else t2
+	var ref_size: Vector2 = ref.get_size()
+	if ref_size.x > 0 and ref_size.y > 0:
+		var s: float = min(160.0 / ref_size.x, 160.0 / ref_size.y)
+		spr.scale = Vector2(s, s)
+	spr.texture = ref
+	add_child(spr)
+	var frame_time := 0.12
+	var loops := 3
+	var tw := create_tween()
+	for i in loops:
+		if t1 != null:
+			tw.tween_callback(func(): spr.texture = t1)
+			tw.tween_interval(frame_time)
+		if t2 != null:
+			tw.tween_callback(func(): spr.texture = t2)
+			tw.tween_interval(frame_time)
+	tw.tween_property(spr, "modulate:a", 0.0, 0.2)
+	tw.tween_callback(spr.queue_free)
 
 func _finish_pip_turn() -> void:
 	pip_choice_buttons.visible = false
@@ -333,6 +620,10 @@ func _finish_pip_turn() -> void:
 	_set_active_actor("player")
 	if not boss_flash_active:
 		pip_text.text = PIP_HINTS.get(expected_spell, "")
+	# Bias cursor toward the spell Pip is hinting (if any).
+	var hinted: int = SPELL_NAMES.find(expected_spell)
+	spell_index = hinted if hinted >= 0 else 0
+	_refresh_spell_cursor()
 
 func _enemy_turn() -> void:
 	state = State.ENEMY_TURN
@@ -392,8 +683,8 @@ func _kill_enemy(idx: int) -> void:
 	e.alive = false
 	e.sprite.play("dead")
 	e.sprite.modulate = Color(0.85, 0.85, 0.85)
-	if e.hp_label:
-		e.hp_label.visible = false
+	if e.hp_bar_root:
+		e.hp_bar_root.visible = false
 	Audio.play_sfx("explosion")
 	Audio.play_sfx("power_up")
 	GameState.hope += 1
@@ -415,7 +706,7 @@ func _kill_enemy(idx: int) -> void:
 	if _alive_count() == 0:
 		if is_boss_fight:
 			GameState.beat_boss = true
-			_start_ending(true)
+			await _offer_boss_letter_choice()
 		else:
 			_offer_choice()
 
@@ -433,20 +724,149 @@ func _offer_choice() -> void:
 	state = State.CHOICE
 	spell_buttons.visible = false
 	choice_buttons.visible = true
-	pip_text.text = "Did you hear them?"
+	pip_text.text = "...will you look at what's left of them?"
+	post_choice_index = 0
+	_refresh_post_choice_cursor()
 
-func _on_listen_pressed() -> void:
+func _on_observe_pressed() -> void:
 	if state != State.CHOICE:
 		return
+	state = State.RESOLVING
+	action_cursor.visible = false
+	_highlight_pair([observe_btn, walk_btn], -1)
 	Audio.play_sfx("tap")
 	GameState.compassion += 1
+	choice_buttons.visible = false
+	pip_text.text = ""
+	if boss_letter_choice:
+		boss_letter_choice = false
+		narration_bg.visible = false
+		narration.text = ""
+		await _show_letter_scroll(BOSS_LETTER)
+		_start_ending(true)
+		return
+	# Humanize the fallen: warm them out of the gray "dead" tint.
+	var warm := Color(1.0, 0.95, 0.85)
+	for e in enemies:
+		if not e.alive:
+			var tw := create_tween()
+			tw.tween_property(e.sprite, "modulate", warm, 0.5)
+	var enc: int = GameState.encounter_index
+	var line: String = OBSERVE_LINES[enc] if enc < OBSERVE_LINES.size() else OBSERVE_LINES[OBSERVE_LINES.size() - 1]
+	narration_bg.visible = true
+	await _reveal_narration(line)
+	# Pip cuts in to dismiss what you saw.
+	pip.modulate = Color(1, 0.7, 0.7)
+	pip_text.text = PIP_OBSERVE_REBUKES[randi() % PIP_OBSERVE_REBUKES.size()]
+	narration_continue.visible = true
+	narration_continue.grab_focus()
+	await narration_continue.pressed
+	Audio.play_sfx("tap")
+	narration_continue.visible = false
+	narration_bg.visible = false
+	narration.text = ""
+	pip.modulate = MOOD_TINTS[mood]
 	_resolve_choice()
 
 func _on_walk_pressed() -> void:
 	if state != State.CHOICE:
 		return
+	action_cursor.visible = false
+	_highlight_pair([observe_btn, walk_btn], -1)
 	Audio.play_sfx("tap")
+	if boss_letter_choice:
+		boss_letter_choice = false
+		choice_buttons.visible = false
+		narration_bg.visible = false
+		narration.text = ""
+		_start_ending(true)
+		return
 	_resolve_choice()
+
+func _offer_boss_letter_choice() -> void:
+	boss_flash_active = false
+	state = State.RESOLVING
+	spell_buttons.visible = false
+	pip_choice_buttons.visible = false
+	action_buttons.visible = false
+	run_button.visible = false
+	reticle.visible = false
+	narration_bg.visible = true
+	await _reveal_narration("It falls. A folded letter rests in the dust where the Shadow stood.")
+	pip.modulate = Color(1, 0.7, 0.7)
+	pip.scale = Vector2(0.5, 0.5) * 1.25
+	pip_text.text = "Don't read it, hero! It's full of lies!"
+	state = State.CHOICE
+	boss_letter_choice = true
+	choice_buttons.visible = true
+	post_choice_index = 0
+	_refresh_post_choice_cursor()
+
+func _show_letter_scroll(text: String) -> void:
+	var w: float = 640.0
+	var h: float = 320.0
+	var origin := Vector2(480.0 - w / 2.0, 270.0 - h / 2.0)
+	var border := ColorRect.new()
+	border.color = Color(0.42, 0.26, 0.14, 0.0)
+	border.size = Vector2(w + 12, h + 12)
+	border.position = origin - Vector2(6, 6)
+	border.z_index = 199
+	add_child(border)
+	var panel := ColorRect.new()
+	panel.color = Color(0.96, 0.9, 0.74, 0.0)
+	panel.size = Vector2(w, h)
+	panel.position = origin
+	panel.z_index = 200
+	add_child(panel)
+	var lbl := Label.new()
+	lbl.text = ""
+	lbl.position = origin + Vector2(32, 32)
+	lbl.size = Vector2(w - 64, h - 110)
+	lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lbl.add_theme_font_size_override("font_size", 22)
+	lbl.add_theme_color_override("font_color", Color(0.18, 0.1, 0.05))
+	lbl.modulate = Color(1, 1, 1, 0)
+	lbl.z_index = 201
+	add_child(lbl)
+	# Reposition Continue to the bottom-right of the scroll so it doesn't cover the text.
+	var btn_size := Vector2(140, 35)
+	var saved_btn_pos := narration_continue.position
+	narration_continue.position = origin + Vector2(w - btn_size.x - 24, h - btn_size.y - 20)
+	narration_continue.z_index = 202
+	action_cursor.visible = false
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(border, "color:a", 0.92, 0.4)
+	tw.tween_property(panel, "color:a", 0.96, 0.4)
+	tw.tween_property(lbl, "modulate:a", 1.0, 0.4)
+	await tw.finished
+	Audio.start_speak()
+	for i in text.length():
+		lbl.text = text.substr(0, i + 1)
+		await get_tree().create_timer(REVEAL_CHAR_DELAY).timeout
+	Audio.stop_speak()
+	await get_tree().create_timer(0.4).timeout
+	narration_continue.visible = true
+	narration_continue.grab_focus()
+	# Triangle indicator appears alongside Continue, anchored to its left edge.
+	_show_cursor_at(narration_continue)
+	action_cursor.z_index = 202
+	await narration_continue.pressed
+	Audio.play_sfx("tap")
+	narration_continue.visible = false
+	action_cursor.visible = false
+	action_cursor.z_index = 0
+	narration_continue.position = saved_btn_pos
+	narration_continue.z_index = 0
+	var tw2 := create_tween()
+	tw2.set_parallel(true)
+	tw2.tween_property(border, "modulate:a", 0.0, 0.35)
+	tw2.tween_property(panel, "modulate:a", 0.0, 0.35)
+	tw2.tween_property(lbl, "modulate:a", 0.0, 0.35)
+	await tw2.finished
+	border.queue_free()
+	panel.queue_free()
+	lbl.queue_free()
 
 func _resolve_choice() -> void:
 	choice_buttons.visible = false
@@ -584,32 +1004,13 @@ func _start_ending(beat: bool) -> void:
 	choice_buttons.visible = false
 	reticle.visible = false
 	pip_action_label.text = ""
-	enemy_hp_label.text = ""
-	ending_panel.visible = true
-	var lines: Array
+	var path: String
 	if beat:
-		lines = [
-			"The Shadow falls.",
-			"For a moment you see what it was: a face. Tired. Small.",
-			"Pip beams. \"HOPE: %d. We did it, hero!\"" % GameState.hope,
-			"The corridor is quiet now.",
-			"Somewhere, a small bright voice is greeting another traveler.",
-		]
+		# hope == 1 means only the boss fell (boss kill counts for +1 hope).
+		path = "res://scenes/ending_boss_only.tscn" if GameState.hope <= 1 else "res://scenes/ending_massacre.tscn"
 	else:
-		lines = [
-			"You turn and walk back the way you came.",
-			"The Shadow does not follow. It never could.",
-			"Behind you, Pip's voice rises, sweet again.",
-			"\"Hello? — Oh! Hello, traveler!\"",
-			"You keep walking. You keep walking. You keep walking.",
-		]
-	ending_text.text = "\n\n".join(lines)
-	ending_button.grab_focus()
-
-func _on_ending_continue() -> void:
-	Audio.play_sfx("tap")
-	GameState.reset_run()
-	get_tree().change_scene_to_file("res://scenes/title.tscn")
+		path = "res://scenes/ending_pacifist.tscn" if GameState.hope == 0 else "res://scenes/ending_walkaway_regret.tscn"
+	get_tree().change_scene_to_file(path)
 
 func _on_shine_pressed() -> void: _on_spell_pressed("Shine")
 func _on_purify_pressed() -> void: _on_spell_pressed("Purify")

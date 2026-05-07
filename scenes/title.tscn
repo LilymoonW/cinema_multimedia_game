@@ -1,9 +1,9 @@
-[gd_scene format=3 uid="uid://b4title1"]
+[gd_scene format=3 uid="uid://begomtlseop0w"]
 
-[ext_resource type="Script" path="res://scripts/title.gd" id="1_title"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/sky.png" id="2_sky"]
-[ext_resource type="Texture2D" path="res://assets/sprites/sparkle1.png" id="3_spark1"]
-[ext_resource type="Texture2D" path="res://assets/sprites/sparkle2.png" id="4_spark2"]
+[ext_resource type="Script" uid="uid://eqyas2vpeq22" path="res://scripts/title.gd" id="1_title"]
+[ext_resource type="Texture2D" uid="uid://i0fe6ueean7l" path="res://assets/backgrounds/sky.png" id="2_sky"]
+[ext_resource type="Texture2D" uid="uid://b07xeel0l2bkw" path="res://assets/sprites/sparkle1.png" id="3_spark1"]
+[ext_resource type="Texture2D" uid="uid://dxfgyvmd4ogxf" path="res://assets/sprites/sparkle2.png" id="4_spark2"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_pip_title"]
 animations = [{
@@ -19,47 +19,88 @@ animations = [{
 "speed": 8.0
 }]
 
-[node name="Title" type="Node2D"]
+[node name="Title" type="Node2D" unique_id=1551672797]
 script = ExtResource("1_title")
 
-[node name="Sky" type="Sprite2D" parent="."]
+[node name="Sky" type="Sprite2D" parent="." unique_id=1614237911]
 position = Vector2(480, 270)
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("2_sky")
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=665638637]
 
-[node name="TitleLabel" type="Label" parent="UI"]
-offset_left = 0.0
-offset_top = 120.0
+[node name="TitleLabel" type="Label" parent="UI" unique_id=2125780323]
+offset_top = 145.0
 offset_right = 960.0
-offset_bottom = 200.0
-text = "Bright Quest"
-horizontal_alignment = 1
+offset_bottom = 225.0
+theme_override_colors/font_color = Color(0.012617188, 0.012617188, 0.0006077929, 1)
 theme_override_font_sizes/font_size = 64
-theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
-
-[node name="Subtitle" type="Label" parent="UI"]
-offset_left = 0.0
-offset_top = 210.0
-offset_right = 960.0
-offset_bottom = 240.0
-text = "A tale of light"
+text = "Shadow Quest"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 20
+
+[node name="Subtitle" type="Label" parent="UI" unique_id=1218191914]
+offset_left = 2.0
+offset_top = 237.0
+offset_right = 962.0
+offset_bottom = 267.0
 theme_override_colors/font_color = Color(1, 0.95, 0.85, 0.85)
+theme_override_font_sizes/font_size = 20
+text = "A hero's Joruney to eradicate the shadows"
+horizontal_alignment = 1
 
-[node name="StartButton" type="Button" parent="UI"]
-offset_left = 380.0
-offset_top = 360.0
-offset_right = 580.0
-offset_bottom = 410.0
-text = "Begin"
+[node name="StartButton" type="Button" parent="UI" unique_id=1447267917]
+offset_left = 222.0
+offset_top = 356.0
+offset_right = 721.0
+offset_bottom = 406.0
 theme_override_font_sizes/font_size = 22
+text = "Begin"
 
-[node name="Pip" type="AnimatedSprite2D" parent="."]
-position = Vector2(580, 280)
+[node name="Pip" type="AnimatedSprite2D" parent="." unique_id=1586274446]
+position = Vector2(297, 281)
 scale = Vector2(0.6, 0.6)
+sprite_frames = SubResource("SpriteFrames_pip_title")
+animation = &"sparkle"
+autoplay = "sparkle"
+
+[node name="Pip" type="AnimatedSprite2D" parent="Pip" unique_id=2120071179]
+position = Vector2(-273.33334, 171.66666)
+scale = Vector2(1.966667, 1.95)
+sprite_frames = SubResource("SpriteFrames_pip_title")
+animation = &"sparkle"
+autoplay = "sparkle"
+
+[node name="Pip" type="AnimatedSprite2D" parent="Pip/Pip" unique_id=1865611626]
+position = Vector2(564.4066, -26.495726)
+scale = Vector2(1.1145486, 1.021688)
+sprite_frames = SubResource("SpriteFrames_pip_title")
+animation = &"sparkle"
+autoplay = "sparkle"
+
+[node name="Pip" type="AnimatedSprite2D" parent="Pip/Pip/Pip" unique_id=805346756]
+position = Vector2(-104.16919, -40.991333)
+scale = Vector2(0.5800847, 0.4773819)
+sprite_frames = SubResource("SpriteFrames_pip_title")
+animation = &"sparkle"
+autoplay = "sparkle"
+
+[node name="Pip2" type="AnimatedSprite2D" parent="Pip/Pip/Pip" unique_id=1838237542]
+position = Vector2(-547.45874, -86.16547)
+scale = Vector2(1.1145486, 1.021688)
+sprite_frames = SubResource("SpriteFrames_pip_title")
+animation = &"sparkle"
+autoplay = "sparkle"
+
+[node name="Pip" type="AnimatedSprite2D" parent="Pip/Pip/Pip/Pip2" unique_id=343301807]
+position = Vector2(502.10873, -147.38388)
+scale = Vector2(0.6186724, 0.72373194)
+sprite_frames = SubResource("SpriteFrames_pip_title")
+animation = &"sparkle"
+autoplay = "sparkle"
+
+[node name="Pip3" type="AnimatedSprite2D" parent="Pip/Pip/Pip" unique_id=1321599186]
+position = Vector2(-138.44063, -237.58238)
+scale = Vector2(0.42690733, 0.4188227)
 sprite_frames = SubResource("SpriteFrames_pip_title")
 animation = &"sparkle"
 autoplay = "sparkle"

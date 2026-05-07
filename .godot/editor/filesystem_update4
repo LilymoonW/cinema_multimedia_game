@@ -3,3 +3,6 @@ res://scenes/combat.tscn
 res://scenes/corridor.tscn
 res://scripts/audio.gd
 res://scripts/corridor.gd
+res://scripts/game_state.gd
+res://scenes/title.tscn
+res://scenes/ending_boss_only.tscn

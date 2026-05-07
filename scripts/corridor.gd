@@ -1,6 +1,6 @@
 extends Node2D
 
-@export var walk_speed: float = 80.0
+@export var walk_speed: float = 110.0
 @export var enemy_spawn_x: float = 900.0
 @export var enemy_spacing: float = 90.0
 @export var collision_offset: float = 80.0
@@ -12,15 +12,17 @@ extends Node2D
 @onready var ground: Sprite2D = $Parallax/Ground
 @onready var ground_top: Sprite2D = $Parallax/GroundTop
 @onready var trees: Node2D = $Parallax/Trees
+@onready var tufts: Node2D = $Parallax/Tufts
 @onready var dialog: Control = $UI/DialogBox
 @onready var dialog_text: Label = $UI/DialogBox/Text
 @onready var dialog_speaker: Label = $UI/DialogBox/Speaker
 @onready var walk_prompt: Label = $UI/WalkPrompt
+@onready var walk_prompt_bg: ColorRect = $UI/WalkPromptBg
 
 const INTRO_LINES := [
 	"Hi I've been waiting for your appearance",
-	"Your  is in danger from the Shadows.",
-	"Hold the right arrow key to walk — your light will save us!",
+	"The world is in danger of currupt individuals.",
+	"Hold the right arrow key to walk and purify enemies!",
 ]
 
 const DIALOG_REVEAL_DELAY := 0.04
@@ -37,6 +39,7 @@ func _ready() -> void:
 	player.play("walk")
 	pip.play("sparkle")
 	walk_prompt.visible = false
+	walk_prompt_bg.visible = false
 	Audio.play_music()
 	_spawn_enemies()
 	if GameState.encounter_index == 0:
@@ -80,18 +83,22 @@ func _process(delta: float) -> void:
 			player.play("walk")
 		Audio.play_walk()
 		walk_prompt.visible = false
+		walk_prompt_bg.visible = false
 		if enemies.size() > 0 and enemies[0].position.x <= player.position.x + collision_offset:
 			_trigger_encounter()
 	else:
 		player.pause()
 		Audio.stop_walk()
 		walk_prompt.visible = true
+		walk_prompt_bg.visible = true
 
 func _scroll_world(dx: float) -> void:
 	sky.position.x -= dx * 0.1
 	ground.region_rect.position.x += dx
 	ground_top.region_rect.position.x += dx
 	for child in trees.get_children():
+		child.position.x -= dx
+	for child in tufts.get_children():
 		child.position.x -= dx
 	for e in enemies:
 		e.position.x -= dx
@@ -140,6 +147,7 @@ func _on_next_pressed() -> void:
 func _begin_walk_phase() -> void:
 	can_walk = true
 	walk_prompt.visible = true
+	walk_prompt_bg.visible = true
 	player.pause()
 
 func _trigger_encounter() -> void:
