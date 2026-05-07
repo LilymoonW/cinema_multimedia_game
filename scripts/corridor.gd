@@ -56,7 +56,7 @@ func _spawn_enemies() -> void:
 	var is_boss: bool = GameState.is_boss_next()
 	cry_template.position = Vector2(enemy_spawn_x, 430)
 	cry_template.visible = true
-	cry_template.play("cry")
+	cry_template.play("idle")
 	if is_boss:
 		var boss_frames := SpriteFrames.new()
 		boss_frames.add_animation("idle")
@@ -75,7 +75,7 @@ func _spawn_enemies() -> void:
 		add_child(e)
 		e.position = Vector2(enemy_spawn_x + i * enemy_spacing, 430)
 		e.visible = true
-		e.play("cry")
+		e.play("idle")
 		enemies.append(e)
 
 func _process(delta: float) -> void:

@@ -132,6 +132,7 @@ var target_index: int = 0
 var damage_buff: int = 0
 var is_boss_fight: bool = false
 var current_enemy_index: int = 0
+var friends_lost: bool = false
 var boss_flash_active: bool = false
 var current_actor: String = "player"
 var action_index: int = 0
@@ -355,7 +356,7 @@ func _on_spell_pressed(spell_name: String = "Light") -> void:
 		target.sprite.play("cry")
 		await get_tree().create_timer(0.6).timeout
 		if target.alive:
-			target.sprite.play("idle")
+			target.sprite.play(_default_enemy_anim())
 	if _alive_count() == 0:
 		return
 	await _enemy_turn()
@@ -591,27 +592,43 @@ func _play_heal_animation() -> void:
 	if t1 == null and t2 == null:
 		return
 	var spr := Sprite2D.new()
-	spr.position = profile.position
+	var start_pos: Vector2 = pip.position
+	var end_pos: Vector2 = profile.position
+	spr.position = start_pos
 	spr.z_index = 100
 	var ref: Texture2D = t1 if t1 != null else t2
 	var ref_size: Vector2 = ref.get_size()
 	if ref_size.x > 0 and ref_size.y > 0:
-		var s: float = min(160.0 / ref_size.x, 160.0 / ref_size.y)
+		var s: float = min(80.0 / ref_size.x, 80.0 / ref_size.y)
 		spr.scale = Vector2(s, s)
 	spr.texture = ref
 	$UI.add_child(spr)
-	var frame_time := 0.12
-	var loops := 3
-	var tw := create_tween()
-	for i in loops:
-		if t1 != null:
-			tw.tween_callback(func(): spr.texture = t1)
-			tw.tween_interval(frame_time)
-		if t2 != null:
-			tw.tween_callback(func(): spr.texture = t2)
-			tw.tween_interval(frame_time)
-	tw.tween_property(spr, "modulate:a", 0.0, 0.2)
-	tw.tween_callback(spr.queue_free)
+
+	var travel_time := 1
+	var arc_height: float = 90.0
+	var control: Vector2 = (start_pos + end_pos) * 0.5 + Vector2(0, -arc_height)
+
+	var flicker := create_tween()
+	flicker.set_loops()
+	var frame_time := 0.08
+	if t1 != null:
+		flicker.tween_callback(func(): spr.texture = t1)
+		flicker.tween_interval(frame_time)
+	if t2 != null:
+		flicker.tween_callback(func(): spr.texture = t2)
+		flicker.tween_interval(frame_time)
+
+	var arc := create_tween()
+	arc.tween_method(
+		func(t: float) -> void:
+			var a: Vector2 = start_pos.lerp(control, t)
+			var b: Vector2 = control.lerp(end_pos, t)
+			spr.position = a.lerp(b, t),
+		0.0, 1.0, travel_time
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	arc.tween_property(spr, "modulate:a", 0.0, 0.2)
+	arc.tween_callback(flicker.kill)
+	arc.tween_callback(spr.queue_free)
 
 func _finish_pip_turn() -> void:
 	pip_choice_buttons.visible = false
@@ -678,6 +695,9 @@ func _set_active_actor(who: String) -> void:
 			if not boss_flash_active:
 				pip.modulate = MOOD_TINTS[mood] * Color(0.6, 0.6, 0.6)
 
+func _default_enemy_anim() -> String:
+	return "sad" if friends_lost and not is_boss_fight else "idle"
+
 func _kill_enemy(idx: int) -> void:
 	var e = enemies[idx]
 	e.alive = false
@@ -690,6 +710,12 @@ func _kill_enemy(idx: int) -> void:
 	GameState.hope += 1
 	_set_mood(Mood.HAPPY)
 	_update_hud()
+	if not is_boss_fight:
+		friends_lost = true
+		var sad_anim: String = _default_enemy_anim()
+		for other in enemies:
+			if other.alive and other.sprite.sprite_frames != null and other.sprite.sprite_frames.has_animation(sad_anim):
+				other.sprite.play(sad_anim)
 	if not is_boss_fight:
 		var enc: int = GameState.encounter_index
 		if enc < NARRATION.size() and current_enemy_index < NARRATION[enc].size():

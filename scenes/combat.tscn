@@ -79,6 +79,17 @@ animations = [{
 "loop": true,
 "name": &"normal",
 "speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_cry2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_cry1")
+}],
+"loop": true,
+"name": &"sad",
+"speed": 3.0
 }]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_boss"]
@@ -181,14 +192,14 @@ texture = ExtResource("2_sky")
 position = Vector2(480, 320)
 scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_enemy")
-animation = &"idle"
+animation = &"normal"
 autoplay = "idle"
 
 [node name="BossTemplate" type="AnimatedSprite2D" parent="." unique_id=841868723]
 position = Vector2(487, 317.00003)
 scale = Vector2(0.88000005, 0.888)
 sprite_frames = SubResource("SpriteFrames_boss")
-animation = &"dizzy"
+animation = &"normal"
 autoplay = "idle"
 
 [node name="EnemyLayer" type="Node2D" parent="." unique_id=841868722]

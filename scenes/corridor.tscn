@@ -13,7 +13,9 @@
 [ext_resource type="Texture2D" uid="uid://bbml57tu5k301" path="res://assets/sprites/enemy1.png" id="10_f323m"]
 [ext_resource type="Texture2D" uid="uid://8mbaa1j78p3x" path="res://assets/sprites/enemy2.png" id="11_so7gr"]
 [ext_resource type="Texture2D" uid="uid://tu7w1g8orwi6" path="res://assets/backgrounds/ground_top.png" id="12_groundtop"]
+[ext_resource type="Texture2D" uid="uid://duf2gkvw6448s" path="res://assets/sprites/cry1.png" id="13_85108"]
 [ext_resource type="Texture2D" uid="uid://by2lrwxqq3h2y" path="res://assets/backgrounds/grass.png" id="13_grass"]
+[ext_resource type="Texture2D" uid="uid://dwo84jeun03wk" path="res://assets/sprites/cry.png" id="14_e36xs"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_player"]
 animations = [{
@@ -56,6 +58,17 @@ animations = [{
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_cry"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_85108")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_e36xs")
+}],
+"loop": true,
+"name": &"cry",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("10_f323m")
@@ -172,7 +185,7 @@ autoplay = "sparkle"
 position = Vector2(820, 430)
 scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_cry")
-animation = &"idle"
+animation = &"cry"
 autoplay = "idle"
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1921867508]
