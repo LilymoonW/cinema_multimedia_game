@@ -1,7 +1,5 @@
 # Shadow Quest
 
-![Title screen](screenshots/title.png)
-
 
 > *"A hero's journey to eradicate the shadows."*
 
@@ -12,6 +10,11 @@ A short Godot game made for a Cinema Creative Project. On the surface, it looks 
 ---
 
 ## The Setup
+
+![boss](assets/sprites/boss.png)
+![boss alternative form](assets/sprites/boss1.png)
+![walk](assets/sprites/walk.png)
+
 
 You play as a small, cute-looking character woken up by Pip, a tiny sparkling spirit who tells you the world is in danger and that you've been chosen to cleanse it. Pip is friendly, encouraging, and constantly reminds you that the "Shadows" are corrupt and dangerous.
 
