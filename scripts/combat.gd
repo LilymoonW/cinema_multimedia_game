@@ -79,7 +79,7 @@ const PIP_BUFF := 2
 const NARRATION := [
 	["...mother..."],
 	["...we were just—", "...please tell my—"],
-	["...my children are—", "...we never wanted—", "...is anyone going to remember—"],
+	["...we never wanted—", "...is anyone going to remember—"],
 ]
 
 const BOSS_FLASH_LINES := [
@@ -599,7 +599,7 @@ func _play_heal_animation() -> void:
 		var s: float = min(160.0 / ref_size.x, 160.0 / ref_size.y)
 		spr.scale = Vector2(s, s)
 	spr.texture = ref
-	add_child(spr)
+	$UI.add_child(spr)
 	var frame_time := 0.12
 	var loops := 3
 	var tw := create_tween()

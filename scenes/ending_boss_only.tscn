@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://cahfxmad7npe4"]
+[gd_scene load_steps=3 format=3 uid="uid://cahfxmad7npe4"]
 
 [ext_resource type="Script" uid="uid://cokoayiemcf7y" path="res://scripts/ending.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://ct2ixn17bviul" path="res://assets/sprites/bossSad.png" id="2_boss"]
 
 [node name="Ending" type="Node2D" unique_id=2078495998]
 script = ExtResource("1_script")
@@ -9,6 +10,14 @@ script = ExtResource("1_script")
 offset_right = 960.0
 offset_bottom = 540.0
 color = Color(0.08, 0.06, 0.12, 1)
+
+[node name="BossRevealed" type="TextureRect" parent="."]
+offset_right = 960.0
+offset_bottom = 540.0
+texture = ExtResource("2_boss")
+expand_mode = 1
+stretch_mode = 5
+modulate = Color(1, 1, 1, 0.6)
 
 [node name="Text" type="Label" parent="." unique_id=1323378245]
 offset_left = 80.0

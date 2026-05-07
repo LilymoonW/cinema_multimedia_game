@@ -173,8 +173,8 @@ animations = [{
 script = ExtResource("1_combat")
 
 [node name="Sky" type="Sprite2D" parent="." unique_id=1804928625]
-position = Vector2(479.5, 266)
-scale = Vector2(0.40635595, 0.40670216)
+position = Vector2(469.99997, 260)
+scale = Vector2(0.41313565, 0.4325971)
 texture = ExtResource("2_sky")
 
 [node name="Enemy" type="AnimatedSprite2D" parent="." unique_id=841868721]
@@ -204,7 +204,7 @@ visible = false
 position = Vector2(480, 320)
 scale = Vector2(0.8, 0.8)
 sprite_frames = SubResource("SpriteFrames_spell")
-animation = &"pow"
+animation = &"slash"
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=511768640]
 

@@ -58,6 +58,14 @@ func _spawn_enemies() -> void:
 	cry_template.visible = true
 	cry_template.play("cry")
 	if is_boss:
+		var boss_frames := SpriteFrames.new()
+		boss_frames.add_animation("idle")
+		boss_frames.set_animation_speed("idle", 4.0)
+		boss_frames.set_animation_loop("idle", true)
+		boss_frames.add_frame("idle", load("res://assets/sprites/boss1.png"))
+		boss_frames.add_frame("idle", load("res://assets/sprites/boss2.png"))
+		cry_template.sprite_frames = boss_frames
+		cry_template.play("idle")
 		cry_template.scale = Vector2(1.6, 1.6)
 		cry_template.modulate = Color(0.5, 0.45, 0.55)
 		cry_template.position.y = 410
